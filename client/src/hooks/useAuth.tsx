@@ -48,6 +48,13 @@ const useAuth = () => {
   },[getAccounts])
 
   const getTokens = useCallback((): Tokens => {
+    if (typeof localStorage === 'undefined') {
+      return {
+        google: {},
+        outlook: {}
+      };
+    }
+    
     const tokensEncrypted = localStorage.getItem("tokens")
     if (tokensEncrypted) {
       const tokens = atob(tokensEncrypted)

@@ -8,7 +8,7 @@ type InitialState = {
 
 const initialState: InitialState = {
   value: {
-    activeEmail: localStorage.getItem("activeEmail") || "",
+    activeEmail: (typeof localStorage != 'undefined') ? localStorage.getItem("activeEmail") ?? "" : "",
   }
 }
 
