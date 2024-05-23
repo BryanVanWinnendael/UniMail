@@ -14,6 +14,7 @@ export const getUserEmails = async (token: TokenObject, type: Platforms, email: 
 
   return await fetch(API_URL + platform, {
     headers: {
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token.access_token}`,
       'Refresh-Token': token.refresh_token,
       'Latest-Email-Time': latest_time_email,
