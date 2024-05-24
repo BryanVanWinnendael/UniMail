@@ -79,6 +79,9 @@ def load_cache(access_token):
 
 
 def save_cache(access_token, cache):
+    if not os.path.exists(CACHE_DIR):
+        os.makedirs(CACHE_DIR)
+
     cache_file = os.path.join(CACHE_DIR, f'{access_token}_cache.json')
     with open(cache_file, 'w') as file:
         json.dump(cache, file, default=str)
