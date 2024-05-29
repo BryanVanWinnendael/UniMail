@@ -21,7 +21,7 @@ export default function RootLayout({
       <CookiesProvider>
         <ClientProviders>
             <body className={cn(
-                "min-h-screen font-sans antialiased bg-[#f1f1f1] flex items-start justify-between",
+                "min-h-[100dvh] font-sans antialiased bg-[#f1f1f1] flex items-start justify-between",
                 fontSans.variable
               )}>
                 {children}

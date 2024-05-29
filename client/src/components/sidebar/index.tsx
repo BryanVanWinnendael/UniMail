@@ -48,7 +48,7 @@ const Index = () => {
 
     <div className="md:hidden flex px-4 pt-2 gap-4 items-center">
       <SheetSidebar/>
-      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-main">UniMail</h1>
+      <h1 className="text-4xl text-[#1A1E23] font-semibold tracking-tight">UniMail</h1>
     </div>
    
   </div>

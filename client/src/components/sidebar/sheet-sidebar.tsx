@@ -4,9 +4,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from "../ui/button"
-import { MailIcon, Mails, Menu } from "lucide-react"
+import { Inbox, Mails, Menu } from "lucide-react"
 import UsersSelect from "../users-select"
 import { usePathname } from "next/navigation"
+import Link from "next/link";
 
 const SheetSidebar = () => {
   const pathname = usePathname() 
@@ -19,16 +20,18 @@ const SheetSidebar = () => {
       <div className="grow px-4">
         <UsersSelect />
         <div className="mt-4 flex flex-col gap-2">
-          <div
-            className={`flex items-center gap-2 cursor-pointer rounded-lg p-2 hover:bg-primary hover:text-secondary duration-150 ${pathname === "inbox" && "bg-primary text-secondary"}`}>
-            <MailIcon className="w-4 h-4"/>
-            Inbox
-          </div>
-          <div
-            className={`flex items-center gap-2 cursor-pointer rounded-lg p-2 hover:bg-primary hover:text-secondary duration-150 ${pathname === "uniBox" && "bg-primary text-secondary"}`}>
-              <Mails className="w-4 h-4"/>
-              UniBox
-          </div>
+          <Link  
+            href="/"
+            className={`text-[#71717a] flex items-center gap-2 cursor-pointer rounded-lg p-2 hover:bg-zinc-200 hover:text-zinc-900 duration-100 transition ${pathname === "/" && "bg-zinc-200 text-zinc-900"}`}>
+            <Inbox className="w-4 h-4 text-indigo-500"/>
+            <p className="text-sm">Inbox</p>
+          </Link>
+          <Link
+            href="/unibox"
+            className={`text-[#71717a] flex items-center gap-2 cursor-pointer rounded-lg p-2 hover:bg-zinc-200 hover:text-zinc-900 duration-100 transition ${pathname === "/unibox" && "bg-zinc-200 text-zinc-900"}`}>
+              <Mails className="w-4 h-4 text-blue-500"/>
+              <p className="text-sm">UniBox</p>
+          </Link>
         </div>
       </div>
       </SheetContent>
