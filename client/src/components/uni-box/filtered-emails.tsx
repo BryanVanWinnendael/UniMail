@@ -1,23 +1,23 @@
-import { Emails } from "@/types";
+import { Emails, UniMails } from "@/types";
 import EmailList from "./email-list";
 
 interface FilteredEmailsProps {
-  emails: { [key: string]: Emails };
+  userEmails: UniMails;
   searchQuery: string;
   handleItemClick: (email: string, id: string) => void;
 }
 
 const FilteredEmails = ({
-  emails,
+  userEmails,
   searchQuery,
   handleItemClick,
 }: FilteredEmailsProps) => {
   const lowerCaseSearchQuery = searchQuery.toLowerCase();
-  const filteredEmails = Object.keys(emails)
+  const filteredEmails = Object.keys(userEmails)
     .map((email) => {
-      const filteredMessages = Object.keys(emails[email])
+      const filteredMessages = Object.keys(userEmails[email].emails)
         .filter((key) => {
-          const message = emails[email][key];
+          const message = userEmails[email].emails[key];
           const subject = message.subject?.toLowerCase() || "";
           const sender = message.sender_email?.toLowerCase() || "";
           return (
@@ -26,11 +26,11 @@ const FilteredEmails = ({
           );
         })
         .reduce((acc, key) => {
-          acc[key] = emails[email][key];
+          acc[key] = userEmails[email].emails[key];
           return acc;
         }, {} as Emails);
 
-      return { email, messages: filteredMessages };
+      return { email, messages: filteredMessages, platform: userEmails[email].platform};
     })
     .filter(
       ({ email, messages }) =>

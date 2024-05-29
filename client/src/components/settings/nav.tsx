@@ -3,7 +3,12 @@ const NAVS = [
   "General"
 ]
 
-const Nav = ({ active, setActive } : { active: string, setActive: (nav: string) => void }) => {
+interface NavProps {
+  active: string
+  setActive: (nav: string) => void
+}
+
+const Nav = ({ active, setActive } : NavProps) => {
   return (
     <div className="w-full h-full flex flex-col gap-2 p-5">
       {

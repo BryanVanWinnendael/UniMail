@@ -10,9 +10,15 @@ const IMAGES: PLATFORMIMAGE = {
   outlook: "https://www.svgrepo.com/show/373951/outlook.svg"
 }
 
-const EmailButton = ({ platform, text, onClick }: { platform: Platforms, text: string, onClick: () => void }) => {
+interface EmailButtonProps {
+  platform: Platforms
+  text: string
+  onClick: () => void
+}
+
+const EmailButton = ({ platform, text, onClick }: EmailButtonProps) => {
   return (
-    <button onClick={onClick} className="px-4 py-2 border flex gap-2 border-slate-200 rounded-lg text-slate-700 hover:border-slate-300 hover:text-slate-900 transition duration-150">
+    <button onClick={onClick} className="w-fit px-4 py-2 border flex gap-2 bg-white border-slate-200 rounded-lg text-slate-700 hover:border-slate-300 hover:text-slate-900 transition duration-150">
       <Image width={24} height={24} src={IMAGES[platform]} loading="lazy" alt="google logo" />
       <span>{text}</span>
   </button>

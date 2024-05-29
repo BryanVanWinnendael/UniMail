@@ -13,7 +13,6 @@ type PlatformsEmails= {
   [key in Platforms]: string[];
 }
 
-
 const useAuth = () => {
   const { instance } = useMsal();
   const router = useRouter()
@@ -88,12 +87,11 @@ const useAuth = () => {
     localStorage.setItem("tokens", btoa(JSON.stringify(tokens)))
   },[getTokens])
   
-  const login = useCallback((token: TokenObject, platform: Platforms, email: string) => {
+  const login = useCallback((token: TokenObject, platform: Platforms, email: string, setActive: boolean = true) => {
     setAccounts(email)
     setToken(token, platform, email)
-    dispatch(setActiveEmail(email))
-    router.push("/")
-  },[dispatch, router, setAccounts, setToken])
+    if (setActive) dispatch(setActiveEmail(email))
+  },[dispatch, setAccounts, setToken])
 
   const logout = (platform: Platforms, email: string) => {
     removeAccount(email)
@@ -174,28 +172,33 @@ const useAuth = () => {
 
   const getOutlookTokenSilent = useCallback(async () => {
     await instance.initialize();
-    const accounts = instance.getAllAccounts()
-    const account = accounts.find((account) => account.username === activeEmail)
-    if (!account) {
+    const outlook_accounts = instance.getAllAccounts()
+    const accounts = getAccounts()
+    if (!accounts) {
       return;
     }
 
-    await instance.acquireTokenSilent({
-      ...loginRequest,
-      account: account,
-    })
-    .then((response) => {
-      if (!response) {
-        return
+    for (const account of outlook_accounts) {
+      if (accounts.includes(account.username)) {
+        await instance.acquireTokenSilent({
+          ...loginRequest,
+          account: account,
+        })
+        .then((response) => {
+          if (!response) {
+            return
+          }
+          const access_token = response.accessToken
+          const account = response.account
+          const email = account.username
+          login({ access_token, refresh_token: "" }, "outlook", email, false)
+        }).catch((error) => {
+          console.log("Outlook silent login error: ", error)
+        })
       }
-      const access_token = response.accessToken
-      const account = response.account
-      const email = account.username
-      login({ access_token, refresh_token: "" }, "outlook", email)
-    }).catch((error) => {
-      console.log("Outlook silent login error: ", error)
-    })
-  },[activeEmail, instance, login])
+    }
+    
+  },[getAccounts, instance, login])
 
   const getFirstAccount = () => {
     const emails = getEmails()

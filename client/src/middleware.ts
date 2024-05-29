@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const middleware = async (req: NextRequest, res: NextResponse) => {
   const accountsCookie = req.cookies.get("accounts");
-  
   if (!accountsCookie) {
     return NextResponse.redirect(new URL("login", req.nextUrl));
   }

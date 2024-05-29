@@ -1,6 +1,10 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
-const Loading = ({ n }: { n: number }) => {
+interface LoadingProps {
+  n: number
+}
+
+const Loading = ({ n }: LoadingProps) => {
   return (
     <div className="flex flex-col gap-4">
       {

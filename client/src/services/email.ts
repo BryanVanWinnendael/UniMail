@@ -1,11 +1,11 @@
-import { Emails, Platforms, TokenObject } from "@/types"
+import { EmailResponse, Platforms, TokenObject } from "@/types"
 
 enum EnumPlatforms {
   google = 'gmail',
   outlook = 'outlook',
 }
 
-export const getUserEmails = async (token: TokenObject, type: Platforms, email: string): Promise<Emails | {error: any}> => {
+export const getUserEmails = async (token: TokenObject, type: Platforms, email: string): Promise<EmailResponse> => {
   const platform = EnumPlatforms[type]
   const latest_time = localStorage.getItem("latest_time") || "{}"
   const latest_time_json = JSON.parse(latest_time)
@@ -21,10 +21,10 @@ export const getUserEmails = async (token: TokenObject, type: Platforms, email: 
       'Email': email, 
     }
   })
-  .then((response) => {
+  .then(async (response) => {
     return response.json()
   })
   .catch((error) => {
-    return {error}
+    return { error }
   })
 }

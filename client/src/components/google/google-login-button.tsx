@@ -3,9 +3,11 @@ import { CodeResponse, useGoogleLogin } from "@react-oauth/google";
 import useAuth from '@/hooks/useAuth';
 import { getAccessRefreshToken } from "@/services/gmail"
 import EmailButton from "../email-button";
+import { useRouter } from 'next/navigation'
 
 const GoogleLoginButton = () => {
   const { login } = useAuth()
+  const router = useRouter()
 
   const getUserInfo = async (token: string) => {
     const res = await fetch("https://www.googleapis.com/oauth2/v1/userinfo?alt=json", {
@@ -25,6 +27,7 @@ const GoogleLoginButton = () => {
       const user = await getUserInfo(access_token);
       const email = user.email
       login({ access_token, refresh_token }, "google", email);
+      router.push("/")
     } catch (error) {
       console.error("Error fetching user info: ", error);
     }

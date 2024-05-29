@@ -3,15 +3,14 @@ from dotenv import load_dotenv
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 import re
-import json
 import os
 from collections import OrderedDict
+from utils.cache import load_cache, save_cache
 
 load_dotenv()
 
 CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
-CACHE_DIR = 'email_cache'
 
 
 def extract_name(email_string):
@@ -70,28 +69,12 @@ def get_body(message):
         return "No body"
 
 
-def load_cache(access_token):
-    cache_file = os.path.join(CACHE_DIR, f'{access_token}_cache.json')
-    if os.path.exists(cache_file):
-        with open(cache_file, 'r') as file:
-            return json.load(file, object_pairs_hook=OrderedDict)
-    return OrderedDict()
-
-
-def save_cache(access_token, cache):
-    if not os.path.exists(CACHE_DIR):
-        os.makedirs(CACHE_DIR)
-
-    cache_file = os.path.join(CACHE_DIR, f'{access_token}_cache.json')
-    with open(cache_file, 'w') as file:
-        json.dump(cache, file, default=str)
-
-
 def get_emails(access_token: str, refresh_token: str, email: str, latest_email_time: int = 0):
     if latest_email_time == 0:
         cache = OrderedDict()
     else:
         cache = load_cache(email)
+
     credentials = Credentials(
         token=access_token,
         refresh_token=refresh_token,

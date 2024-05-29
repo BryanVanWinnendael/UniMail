@@ -3,7 +3,11 @@ import useAuth from "@/hooks/useAuth";
 import { msalInstance } from "@/config/msal";
 import EmailButton from "../email-button";
 
-const OutlookLogoutButton = ({ email }: { email: string }) => {
+interface OutlookLogoutButtonProps {
+  email: string;
+}
+
+const OutlookLogoutButton = ({ email }: OutlookLogoutButtonProps) => {
   const { logout } = useAuth()
 
   const handleLogout = async () => {

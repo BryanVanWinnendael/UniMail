@@ -2,7 +2,11 @@
 import useAuth from '@/hooks/useAuth';
 import EmailButton from '../email-button';
 
-const GoogleLogoutButton = ({ email }: { email: string }) => {
+interface GoogleLogoutButtonProps {
+  email: string;
+}
+
+const GoogleLogoutButton = ({ email }: GoogleLogoutButtonProps) => {
   const { logout } = useAuth()
 
   const handleLogout = () => {

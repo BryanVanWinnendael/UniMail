@@ -2,7 +2,7 @@
 import {
   Dialog,
   DialogContent,
-  DialogTitle,
+  DialogOverlay,
 } from "@/components/ui/dialog"
 import { toggleDialog } from "@/redux/features/settings-slice";
 import { useAppSelector } from "@/redux/store";
@@ -19,6 +19,7 @@ const SettingsDialog = () => {
 
   return (
     <Dialog onOpenChange={handleToggleDialog} open={isOpen}>
+      <DialogOverlay className="bg-transparent" />
       <DialogContent className="w-full h-2/3 max-w-4xl p-0 m-0 border-0 bg-transparent">
         <Settings />
       </DialogContent>

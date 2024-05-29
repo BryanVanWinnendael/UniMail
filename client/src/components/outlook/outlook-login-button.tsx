@@ -3,6 +3,7 @@ import useAuth from "@/hooks/useAuth";
 import { InteractionType } from "@azure/msal-browser";
 import { useMsalAuthentication } from "@azure/msal-react";
 import EmailButton from "../email-button";
+import { useRouter } from 'next/navigation'
 
 const request = {
   scopes: ["User.Read", "Mail.Read", "Mail.ReadWrite"],
@@ -12,7 +13,8 @@ const request = {
 const OutlookLoginButton = () => {
   const { login } = useAuth()
   const { login: loginOutlook } = useMsalAuthentication(InteractionType.Silent, request);
-
+  const router = useRouter()
+  
   const handleLogin = async () => {
     await loginOutlook(InteractionType.Popup, request)
     .then((response) => {
@@ -23,6 +25,7 @@ const OutlookLoginButton = () => {
       const account = response.account
       const email = account.username
       login({ access_token, refresh_token: "" }, "outlook", email)
+      router.push("/")
     })
     .catch((error) => {
       console.log(error);

@@ -1,3 +1,4 @@
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,21 +7,49 @@ import {
 } from "@/components/ui/dropdown-menu"
 import Spinner from "../spinner"
 import { RefreshCcw } from "lucide-react";
-import { Button } from "../ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
-const RefreshButton = ({ loading, refresh }: { loading: boolean, refresh: (type: "hard"| "soft") => void }) => {
+interface RefreshButtonProps {
+  loading: boolean
+  refresh: (type: "hard"| "soft") => void
+}
+
+const RefreshButton = ({ loading, refresh }: RefreshButtonProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger disabled={loading}>
-        <Button variant="default" className="cursor-pointer rounded-md h-10 w-10 p-2 flex items-center justify-center">
         {
-          loading ? <Spinner size={4}/> : <RefreshCcw className="w-4 h-4 text-white"/>
+          loading ? <Spinner size={4}/> : 
+          <Tooltip>
+          <TooltipTrigger className="w-full text-left"> <RefreshCcw className="w-4 h-4 text-black"/></TooltipTrigger>
+          <TooltipContent>
+            <p>refresh</p>
+          </TooltipContent>
+        </Tooltip>
+         
         }
-      </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => refresh("soft")}>Soft</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => refresh("hard")}>Force</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => refresh("soft")}>
+        <Tooltip>
+          <TooltipTrigger className="w-full text-left">Soft</TooltipTrigger>
+          <TooltipContent>
+            <p>only refresh uncached emails</p>
+          </TooltipContent>
+        </Tooltip>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => refresh("hard")}>
+        <Tooltip>
+          <TooltipTrigger className="w-full text-left">Force</TooltipTrigger>
+          <TooltipContent>
+            <p>refresh all emails</p>
+          </TooltipContent>
+        </Tooltip>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

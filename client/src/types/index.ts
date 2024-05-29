@@ -5,6 +5,11 @@ export type TokenObject ={
   refresh_token: string;
 }
 
+export type EmailResponse = {
+  data?: UserEmails;
+  error?: any;
+}
+
 export type Email = {
   subject: string;
   sender: string;
@@ -14,7 +19,17 @@ export type Email = {
 }
 
 export type Emails = {
-  [key: string]: Email;
+  [key: string]: Email
+}
+
+export type UserEmails = {
+  user: string
+  emails: Emails
+  platform: Platforms
+}
+
+export type UniMails = {
+  [key: string]: UserEmails
 }
 
 export type User = {
@@ -23,10 +38,12 @@ export type User = {
   [key: string] : any
 }
 
-export type Active = "inbox" | "uniBox"
-
 export type Tokens = {
   [key in Platforms]: {
     [key: string]: TokenObject;
   }
+}
+
+export type PlatformsEmails= {
+  [key in Platforms]: string[];
 }

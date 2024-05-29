@@ -1,6 +1,10 @@
 import { useEffect, useRef } from "react";
 
-const EmailFrame = ({ body }: { body: string }) => {
+interface EmailFrameProps {
+  body: string
+}
+
+const EmailFrame = ({ body }: EmailFrameProps) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {

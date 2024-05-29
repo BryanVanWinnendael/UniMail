@@ -1,4 +1,3 @@
-"use client"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -18,6 +17,7 @@ import useAuth from "@/hooks/useAuth"
 import { useAppSelector } from "@/redux/store"
 import { useDispatch } from "react-redux"
 import { setActiveEmail } from "@/redux/features/auth-slice"
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
 
 const UsersSelect = () => {
@@ -47,7 +47,13 @@ const UsersSelect = () => {
           aria-expanded={open}
           className="w-full justify-between"
         >
-          <p className="overflow-hidden text-ellipsis whitespace-nowrap"> {value}</p>
+          <Tooltip>
+            <TooltipTrigger className="overflow-hidden"> <p className="overflow-hidden text-ellipsis whitespace-nowrap"> {value}</p></TooltipTrigger>
+            <TooltipContent>
+              <p>{value}</p>
+            </TooltipContent>
+          </Tooltip>
+          
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -73,7 +79,13 @@ const UsersSelect = () => {
                           value === email ? "opacity-100" : "opacity-0"
                         )}
                       />
-                      <p className="overflow-hidden text-ellipsis whitespace-nowrap">{email}</p>
+                      <Tooltip>
+                        <TooltipTrigger className="overflow-hidden"> <p className="overflow-hidden text-ellipsis whitespace-nowrap">{email}</p></TooltipTrigger>
+                        <TooltipContent>
+                          <p>{email}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      
                     </CommandItem>
                     )
                 })

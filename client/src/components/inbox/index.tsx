@@ -1,6 +1,6 @@
 import useAuth from "@/hooks/useAuth"
 import { getUserEmails } from "@/services/email"
-import { Emails } from "@/types"
+import { UserEmails } from "@/types"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Toolbar from "./toolbar"
 import { useAppSelector } from "@/redux/store"
@@ -9,17 +9,28 @@ import { toast } from "sonner"
 import EmailList from "./email-list"
 import Email from "./email"
 
-const Index = () => {
+const DEFAULT_EMAILS: UserEmails = {
+  user: "",
+  emails: {},
+  platform: "google"
+}
+
+interface IndexProps {
+  setEmailsCount: (n: number) => void
+}
+
+const Index = ({ setEmailsCount } : IndexProps) => {
   const [loading, setLoading] = useState<boolean>(true)
-  const [emails, setEmails] = useState<Emails>({})
-  const emailsCount = useMemo(() => Object.keys(emails).length, [emails])
+  const [userEmails, setUserEmails] = useState<UserEmails>(DEFAULT_EMAILS)
+  const countEmails = useMemo(() => Object.keys(userEmails.emails).length, [userEmails])
   const [activeMail, setActiveMail] = useState<string>("")
   const { getActiveAccessToken } = useAuth()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const scrollPositionRef = useRef<number>(0)
   const activeAccount = useAppSelector((state) => state.authReducer.value.activeEmail)
-  const [newUser, setNewUser] = useState<boolean>(true)
+  const [hardRefresh, setHardRefresh] = useState<boolean>(true)
   const [searchQuery, setSearchQuery] = useState<string>("")
+  const [fullScreenEmail, setFullScreenEmail] = useState(false);
 
   const handleItemClick = (id: string) => {
     if (scrollContainerRef.current) {
@@ -37,15 +48,17 @@ const Index = () => {
   }
 
   const getEmails = useCallback(async (refresh?: boolean) => {
+    setEmailsCount(0)
     setActiveMail("")
     setLoading(true)
+
     const { token, platform } = getActiveAccessToken()
-    const res_emails = await getUserEmails(token, platform, activeAccount)
-    if (res_emails.error) {
-      setLoading(false)
-      setNewUser(false)
-      setEmails({})
-      return toast(`Error fetching emails, please try again later`, {
+    const res = await getUserEmails(token, platform, activeAccount)
+
+    if (res.error) {
+      setUserEmails(DEFAULT_EMAILS)
+      toast(`Error fetching emails, please try again later`, {
+        id: "error-toast",
         action: {
           label: "Close",
           onClick: () => console.log("Close"),
@@ -58,39 +71,48 @@ const Index = () => {
           closeButton: '!bg-secondary',
         },
       })
-    }
-    const count_new = Object.keys(res_emails).length - emailsCount
-    if (refresh) {
-      toast(`You have ${count_new} new emails`, {
-        action: {
-          label: "Close",
-          onClick: () => console.log("Close"),
-        },
-        classNames: {
-          toast: '!bg-primary',
-          title: '!text-secondary',
-          actionButton: '!bg-secondary',
-          cancelButton: '!bg-secondary',
-          closeButton: '!bg-secondary',
-        },
-      })
-    }
+    } else if (res.data) {
+      const data = res.data
+      const emails = data.emails
+      setUserEmails(data)
+      setEmailsCount(Object.keys(emails).length)
 
-    const latest_times = localStorage.getItem("latest_time")
-    const latest_times_json = JSON.parse(latest_times || "{}")
+      if (refresh) {
+        const countNewEmails = Object.keys(emails).length
+        const newEmails = countNewEmails - countEmails
 
-    const latest_time = Math.max(...Object.values(res_emails).map((email) => {
-      if (!email.date) {
-        return 0
+        toast(`You have ${newEmails} new emails`, {
+          action: {
+            label: "Close",
+            onClick: () => console.log("Close"),
+          },
+          classNames: {
+            toast: '!bg-primary',
+            title: '!text-secondary',
+            actionButton: '!bg-secondary',
+            cancelButton: '!bg-secondary',
+            closeButton: '!bg-secondary',
+          },
+        })
       }
-      return new Date(email.date).getTime()
-    }))
-    latest_times_json[activeAccount] = latest_time
-    localStorage.setItem("latest_time", JSON.stringify(latest_times_json))
-    setEmails(res_emails)
+
+      const latest_times = localStorage.getItem("latest_time")
+      const latest_times_json = JSON.parse(latest_times || "{}")
+
+      const latest_time = Math.max(...Object.values(emails).map((email) => {
+        if (!email.date) {
+          return 0
+        }
+        return new Date(email.date).getTime()
+      }))
+
+      latest_times_json[activeAccount] = latest_time
+      localStorage.setItem("latest_time", JSON.stringify(latest_times_json))
+    }
+
     setLoading(false)
-    setNewUser(false)
-  }, [activeAccount, emailsCount, getActiveAccessToken])
+    setHardRefresh(false)
+  },[activeAccount, getActiveAccessToken, setEmailsCount, countEmails])
 
   const refresh = (type: "hard" | "soft") => {
     if (type === "hard") {
@@ -98,15 +120,14 @@ const Index = () => {
       const latest_times_json = JSON.parse(latest_times || "{}")
       latest_times_json[activeAccount] = 0
       localStorage.setItem("latest_time", JSON.stringify(latest_times_json))
-      setNewUser(true)
+      setHardRefresh(true)
     }
     getEmails(true)
   }
 
   useEffect(() => {
-    setNewUser(true)
     getEmails()
-  }, [getEmails, activeAccount])
+  }, [activeAccount, getEmails])
 
   useEffect(() => {
     if (!activeMail) {
@@ -117,13 +138,18 @@ const Index = () => {
   }, [activeMail])
 
   return (
-    <div className="lg:h-screen h-full w-full bg-neutral-50 gap-3 flex flex-col py-4 lg:pl-0 pl-4 pr-4 overflow-hidden">
-      <Toolbar loading={loading} refresh={refresh} emailsCount={emailsCount} setSearchQuery={setSearchQuery} />
+    <div className="h-full w-full gap-3 flex flex-col pb-4 lg:pl-0 pl-4 pr-4 overflow-hidden">
       <div 
-        className="bg-white rounded-md h-full w-full overflow-y-auto p-4 border border-slate-200 shadow-md" 
-        ref={scrollContainerRef}
+        className="bg-white rounded-md h-full w-full p-4 overflow-hidden shadow shadow-zinc-900/5 flex flex-col" 
       >
-        {newUser ? <Loading n={10} /> : (activeMail ? <Email sender_email={emails[activeMail].sender_email} encoded_body={emails[activeMail].body} handleBackToInbox={handleBackToInbox} /> : <EmailList emails={emails} searchQuery={searchQuery} handleItemClick={handleItemClick} />)}
+        <Toolbar emails={userEmails} sortType="user" setEmails={setUserEmails} searchQuery={searchQuery} handleBackToInbox={handleBackToInbox} sender_email={userEmails.emails[activeMail] ? userEmails.emails[activeMail].sender_email : null} fullScreenEmail={fullScreenEmail} setFullScreenEmail={setFullScreenEmail} loading={loading} refresh={refresh} setSearchQuery={setSearchQuery} />
+        <div className="overflow-y-auto h-full" ref={scrollContainerRef}>
+          {hardRefresh ? <Loading n={10} /> 
+          : 
+            (activeMail ? <Email fullScreenEmail={fullScreenEmail} setFullScreenEmail={setFullScreenEmail} encoded_body={userEmails.emails[activeMail].body}/> 
+            : <EmailList emails={userEmails.emails} searchQuery={searchQuery} handleItemClick={handleItemClick} />)
+          }
+        </div>
       </div>
     </div>
   )
