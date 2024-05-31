@@ -6,8 +6,10 @@ import re
 import os
 from collections import OrderedDict
 from utils.cache import load_cache, save_cache
-
+from utils.colors import get_ambient_color
+from concurrent.futures import ThreadPoolExecutor, as_completed
 load_dotenv()
+
 
 CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
@@ -17,11 +19,9 @@ def extract_name(email_string):
     match = re.match(r"(.+?) <.+?>", email_string)
     if match:
         return match.group(1).strip()
-
     match = re.match(r"([^@]+)@.+", email_string)
     if match:
         return match.group(1).strip()
-
     return email_string.strip()
 
 
@@ -31,7 +31,6 @@ def get_sender(email) -> str:
         if header["name"] == "From":
             sender = header["value"]
             break
-
     sender = extract_name(sender)
     sender = sender.replace('"', '')
     return sender
@@ -43,7 +42,6 @@ def get_subject(email) -> str:
         if header["name"] == "Subject":
             subject = header["value"]
             break
-
     return subject
 
 
@@ -58,15 +56,47 @@ def get_sender_email(email) -> str:
             else:
                 sender_email = sender
             break
-
     return sender_email
 
 
 def get_body(message):
     try:
-        return message["payload"]["parts"][1]["body"]["data"]
-    except (KeyError, IndexError):
+        if "parts" in message["payload"] and len(message["payload"]["parts"]) > 1:
+            return message["payload"]["parts"][1].get("body", {}).get("data", "No body")
+        else:
+            return message["payload"]["body"].get("data", "No body")
+    except KeyError:
         return "No body"
+
+
+def process_email(service, message_id, latest_email_time):
+    msg = service.users().messages().get(userId='me', id=message_id).execute()
+
+    timestamp_ms = int(msg["internalDate"])
+    if timestamp_ms <= latest_email_time:
+        return None
+
+    subject = get_subject(msg)
+    sender = get_sender(msg)
+    sender_email = get_sender_email(msg)
+    timestamp_s = timestamp_ms / 1000
+    date_time = datetime.fromtimestamp(timestamp_s)
+
+    if date_time < datetime.fromtimestamp(latest_email_time / 1000):
+        return None
+
+    body = get_body(msg)
+    # ambient_color = get_ambient_color(body)
+    print(f"done processing email {message_id}")
+    return {
+        'id': message_id,
+        'subject': subject,
+        'sender': sender,
+        'sender_email': sender_email,
+        'date': date_time,
+        'body': body,
+        'ambient_color': "ambient_color"
+    }
 
 
 def get_emails(access_token: str, refresh_token: str, email: str, latest_email_time: int = 0):
@@ -96,36 +126,15 @@ def get_emails(access_token: str, refresh_token: str, email: str, latest_email_t
     results = service.users().messages().list(userId='me', q=query).execute()
     messages = results.get('messages', [])
     new_emails = OrderedDict()
+    print("done fetching emails")
 
-    for message in messages:
-        msg = service.users().messages().get(
-            userId='me', id=message['id']).execute()
-
-        timestamp_ms = int(msg["internalDate"])
-        if timestamp_ms <= latest_email_time:
-            continue
-
-        id = msg["id"]
-        subject = get_subject(msg)
-        sender = get_sender(msg)
-        sender_email = get_sender_email(msg)
-
-        timestamp_s = timestamp_ms / 1000
-        date_time = datetime.fromtimestamp(timestamp_s)
-
-        # Check if the email is after the latest_email_time
-        if date_time < datetime.fromtimestamp(latest_email_time / 1000):
-            continue
-
-        body = get_body(msg)
-
-        new_emails[id] = {
-            'subject': subject,
-            'sender': sender,
-            'sender_email': sender_email,
-            'date': date_time,
-            'body': body
-        }
+    with ThreadPoolExecutor() as executor:
+        future_to_message = {executor.submit(
+            process_email, service, message['id'], latest_email_time): message['id'] for message in messages}
+        for future in as_completed(future_to_message):
+            result = future.result()
+            if result:
+                new_emails[result['id']] = result
 
     combined_cache = OrderedDict(
         list(new_emails.items()) + list(cache.items()))

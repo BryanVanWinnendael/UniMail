@@ -64,11 +64,8 @@ const Index = ({ setEmailsCount } : IndexProps) => {
           onClick: () => console.log("Close"),
         },
         classNames: {
-          toast: '!bg-red-600',
-          title: '!text-secondary',
-          actionButton: '!bg-secondary',
-          cancelButton: '!bg-secondary',
-          closeButton: '!bg-secondary',
+          toast: "!bg-red-600",
+          title: "!text-white",
         },
       })
     } else if (res.data) {
@@ -87,11 +84,7 @@ const Index = ({ setEmailsCount } : IndexProps) => {
             onClick: () => console.log("Close"),
           },
           classNames: {
-            toast: '!bg-primary',
-            title: '!text-secondary',
-            actionButton: '!bg-secondary',
-            cancelButton: '!bg-secondary',
-            closeButton: '!bg-secondary',
+            toast: "!bg-primary",
           },
         })
       }
@@ -140,9 +133,18 @@ const Index = ({ setEmailsCount } : IndexProps) => {
   return (
     <div className="h-full w-full gap-3 flex flex-col pb-4 lg:pl-0 pl-4 pr-4 overflow-hidden">
       <div 
-        className="bg-white rounded-md h-full w-full p-4 overflow-hidden shadow shadow-zinc-900/5 flex flex-col" 
+        className="bg-primary rounded-md h-full w-full p-4 overflow-hidden shadow shadow-zinc-900/5 flex flex-col" 
       >
-        <Toolbar emails={userEmails} sortType="user" setEmails={setUserEmails} searchQuery={searchQuery} handleBackToInbox={handleBackToInbox} sender_email={userEmails.emails[activeMail] ? userEmails.emails[activeMail].sender_email : null} fullScreenEmail={fullScreenEmail} setFullScreenEmail={setFullScreenEmail} loading={loading} refresh={refresh} setSearchQuery={setSearchQuery} />
+        <Toolbar 
+          emails={userEmails} 
+          sortType="user" setEmails={setUserEmails} searchQuery={searchQuery} handleBackToInbox={handleBackToInbox} 
+          active_email={userEmails.emails[activeMail] ? {
+            from:  userEmails.emails[activeMail].sender_email,
+            to: userEmails.emails[activeMail].receiver,
+            subject: userEmails.emails[activeMail].subject,
+            date: userEmails.emails[activeMail].date
+          } : null} fullScreenEmail={fullScreenEmail} 
+          setFullScreenEmail={setFullScreenEmail} loading={loading} refresh={refresh} setSearchQuery={setSearchQuery} />
         <div className="overflow-y-auto h-full" ref={scrollContainerRef}>
           {hardRefresh ? <Loading n={10} /> 
           : 

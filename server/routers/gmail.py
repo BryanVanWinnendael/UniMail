@@ -18,4 +18,9 @@ def get_emails(token: str = Depends(get_bearer_token), refresh_token: str = Head
             }
         }
     except Exception as e:
-        return {"error": str(e)}
+        return {
+            "error": {
+                "user": email,
+                "message": str(e),
+            }
+        }

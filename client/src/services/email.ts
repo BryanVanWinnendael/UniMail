@@ -6,6 +6,7 @@ enum EnumPlatforms {
 }
 
 export const getUserEmails = async (token: TokenObject, type: Platforms, email: string): Promise<EmailResponse> => {
+  console.log(token.refresh_token)
   const platform = EnumPlatforms[type]
   const latest_time = localStorage.getItem("latest_time") || "{}"
   const latest_time_json = JSON.parse(latest_time)

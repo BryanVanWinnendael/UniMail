@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import requests
 from datetime import datetime, timedelta, timezone
+from utils.colors import get_ambient_color
 from utils.cache import load_cache, save_cache
 import pytz
 
@@ -79,12 +80,16 @@ def get_emails(access_token: str, email: str, latest_email_time: int = 0):
         content = mail.get('body', {}).get('content', '')
         body = encode_to_base64(content)
 
+        ambient_color = get_ambient_color(body)
+
         new_emails[id] = {
             'subject': subject,
             'sender': sender,
             'sender_email': sender_email,
             'date': date_time.replace(tzinfo=pytz.UTC),
-            'body': body
+            'body': body,
+            'receiver': email,
+            'ambient_color': ambient_color
         }
 
     combined_cache = OrderedDict(

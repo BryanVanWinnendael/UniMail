@@ -25,7 +25,7 @@ const RefreshButton = ({ loading, refresh }: RefreshButtonProps) => {
         {
           loading ? <Spinner size={4}/> : 
           <Tooltip>
-          <TooltipTrigger className="w-full text-left"> <RefreshCcw className="w-4 h-4 text-black"/></TooltipTrigger>
+          <TooltipTrigger className="w-full text-left"> <RefreshCcw className="w-4 h-4 text-ring"/></TooltipTrigger>
           <TooltipContent>
             <p>refresh</p>
           </TooltipContent>

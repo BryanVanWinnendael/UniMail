@@ -7,15 +7,20 @@ export type TokenObject ={
 
 export type EmailResponse = {
   data?: UserEmails;
-  error?: any;
+  error?: {
+    user: string;
+    message: string;
+  };
 }
 
 export type Email = {
   subject: string;
   sender: string;
   sender_email: string;
+  receiver: string;
   date: string;
   body: string;
+  ambient_color: [number, number, number];
 }
 
 export type Emails = {

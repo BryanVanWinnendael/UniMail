@@ -97,8 +97,7 @@ const Index = ({ setEmailsCount } : IndexProps) => {
      
       results.forEach((res, _) => {
         if (res.error) {
-          console.error("Error fetching emails:", res.error);
-          toast(`Error fetching emails, please try again later`, {
+          toast(`Error fetching emails for ${res.error.user}, please try again later`, {
             id: "error-toast",
             action: {
               label: "Close",
@@ -106,10 +105,7 @@ const Index = ({ setEmailsCount } : IndexProps) => {
             },
             classNames: {
               toast: "!bg-red-600",
-              title: "!text-secondary",
-              actionButton: "!bg-secondary",
-              cancelButton: "!bg-secondary",
-              closeButton: "!bg-secondary",
+              title: "!text-white",
             },
           });
         } else if (res.data) {
@@ -126,7 +122,6 @@ const Index = ({ setEmailsCount } : IndexProps) => {
       setUserEmails(newEmails);
 
       if (refresh) {
-        console.log(emailsCount, countNewEmails)
         const newEmails = countNewEmails - emailsCount;
         toast(`You have ${newEmails} new emails`, {
           action: {
@@ -135,10 +130,6 @@ const Index = ({ setEmailsCount } : IndexProps) => {
           },
           classNames: {
             toast: "!bg-primary",
-            title: "!text-secondary",
-            actionButton: "!bg-secondary",
-            cancelButton: "!bg-secondary",
-            closeButton: "!bg-secondary",
           },
         });
       }
@@ -164,7 +155,7 @@ const Index = ({ setEmailsCount } : IndexProps) => {
   return (
     <div className="h-full w-full gap-3 flex flex-col pb-4 lg:pl-0 pl-4 pr-4 overflow-hidden">
       <div 
-        className="bg-white rounded-md h-full w-full p-4 overflow-hidden shadow shadow-zinc-900/5 flex flex-col" 
+        className="bg-primary rounded-md h-full w-full p-4 overflow-hidden shadow shadow-zinc-900/5 dark:shadow-zing-100/5 flex flex-col" 
       >
         <Toolbar
           searchQuery={searchQuery}
@@ -174,7 +165,12 @@ const Index = ({ setEmailsCount } : IndexProps) => {
           loading={loading}
           refresh={refresh}
           setSearchQuery={setSearchQuery}
-          sender_email={userEmails[activeMail.email] ? userEmails[activeMail.email].emails[activeMail.id].sender_email : null}
+          active_email={userEmails[activeMail.email] ? {
+            from: userEmails[activeMail.email].emails[activeMail.id].sender_email,
+            to: userEmails[activeMail.email].emails[activeMail.id].receiver,
+            date: userEmails[activeMail.email].emails[activeMail.id].date,
+            subject: userEmails[activeMail.email].emails[activeMail.id].subject
+          } : null}
           setEmails={setUserEmails}
           sortType="uni"
           emails={userEmails}

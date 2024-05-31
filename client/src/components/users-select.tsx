@@ -71,7 +71,6 @@ const UsersSelect = () => {
                       onSelect={(currentValue) => {
                         handleSwitchAccount(currentValue)
                       }}
-                      className="cursor-pointer"
                     >
                       <Check
                         className={cn(

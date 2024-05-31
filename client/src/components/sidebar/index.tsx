@@ -19,26 +19,26 @@ const Index = () => {
   <div className="md:min-h-screen w-full">
     <div className="md:flex hidden flex-col">
       <div className="pl-4 flex h-fit py-2 items-center">
-        <h1 className="scroll-m-20 text-lg text-[#1A1E23] font-semibold tracking-tight">UniMail</h1>
+        <h1 className="scroll-m-20 text-lg font-semibold tracking-tight">UniMail</h1>
       </div>
       <div className="grow px-4">
         <UsersSelect />
         <div className="mt-4 flex flex-col gap-2">
           <Link  
             href="/"
-            className={`text-[#71717a] flex items-center gap-2 cursor-pointer rounded-lg p-2 hover:bg-zinc-200 hover:text-zinc-900 duration-100 transition ${pathname === "/" && "bg-zinc-200 text-zinc-900"}`}>
+            className={`text-[#71717a] flex items-center gap-2 cursor-pointer rounded-lg p-2 hover:bg-muted dark:hover:text-zinc-100 hover:text-black duration-100 transition ${pathname === "/" && "bg-muted dark:text-zinc-100 text-zinc-900"}`}>
             <Inbox className="w-4 h-4 text-indigo-500"/>
             <p className="text-sm">Inbox</p>
           </Link>
           <Link
             href="/unibox"
-            className={`text-[#71717a] flex items-center gap-2 cursor-pointer rounded-lg p-2 hover:bg-zinc-200 hover:text-zinc-900 duration-100 transition ${pathname === "/unibox" && "bg-zinc-200 text-zinc-900"}`}>
+            className={`text-[#71717a] flex items-center gap-2 cursor-pointer rounded-lg p-2 hover:bg-muted dark:hover:text-zinc-100 hover:text-black duration-100 transition ${pathname === "/unibox" && "bg-muted dark:text-zinc-100 text-zinc-900"}`}>
               <Mails className="w-4 h-4 text-blue-500"/>
               <p className="text-sm">UniBox</p>
           </Link>
           <div
             onClick={handleToggleDialog}
-            className={`text-[#71717a] flex items-center gap-2 cursor-pointer rounded-lg p-2 hover:bg-zinc-200 hover:text-zinc-900 duration-100 transition`}>
+            className={`text-[#71717a] flex items-center gap-2 cursor-pointer rounded-lg p-2 hover:bg-muted dark:hover:text-zinc-100 hover:text-black duration-100 transition`}>
              <Settings className="w-4 h-4"/>
              <p className="text-sm">Settings</p>
           </div>
@@ -48,7 +48,7 @@ const Index = () => {
 
     <div className="md:hidden flex px-4 pt-2 gap-4 items-center">
       <SheetSidebar/>
-      <h1 className="text-4xl text-[#1A1E23] font-semibold tracking-tight">UniMail</h1>
+      <h1 className="text-4xl font-semibold tracking-tight">UniMail</h1>
     </div>
    
   </div>

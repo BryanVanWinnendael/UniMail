@@ -13,7 +13,7 @@ const Accounts = () => {
   return (
     <div className="p-5 flex flex-col h-full">
 			<div className="mb-5">
-				<h4 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">Add an account</h4>
+				<h4 className="scroll-m-20 border-b pb-2 text-xl font-semibold tracking-tight first:mt-0">Add an account</h4>
 				<div className="flex flex-col gap-2 w-fit mt-3">
 					<GoogleLoginButton />
 					<OutlookLoginButton />
@@ -21,7 +21,7 @@ const Accounts = () => {
 			</div>
 
 			<div className="mb-5 h-full flex flex-col overflow-y-auto">
-				<h4 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">Remove an account</h4>
+				<h4 className="scroll-m-20 border-b pb-2 text-xl font-semibold tracking-tight first:mt-0">Remove an account</h4>
 				<div className="flex flex-col gap-2 w-fit mt-3 overflow-y-auto h-full pb-2 px-2">
 					{platforms.map((platform) => {
 						return emails[platform].map((email) => {

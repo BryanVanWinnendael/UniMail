@@ -1,6 +1,6 @@
 const NAVS = [
+  "General",
   "Accounts",
-  "General"
 ]
 
 interface NavProps {
@@ -15,7 +15,7 @@ const Nav = ({ active, setActive } : NavProps) => {
         NAVS.map((nav) => {
           return (
             <div onClick={() => setActive(nav)} key={nav} 
-            className={`w-full ${active === nav && "bg-primary text-secondary border border-gray border-opacity-10"} rounded-md py-1 px-2 cursor-pointer hover:text-secondary hover:bg-primary duration-150`}>
+              className={`w-full ${active === nav && "bg-muted dark:text-zinc-100 text-zinc-900"} text-[#71717a] rounded-md py-1 px-2 cursor-pointer hover:bg-muted hover:text-zinc-900 dark:hover:text-zinc-100 duration-100 transition`}>
               {nav}
             </div>
           )

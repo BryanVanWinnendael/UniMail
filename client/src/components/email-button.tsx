@@ -18,7 +18,7 @@ interface EmailButtonProps {
 
 const EmailButton = ({ platform, text, onClick }: EmailButtonProps) => {
   return (
-    <button onClick={onClick} className="w-fit px-4 py-2 border flex gap-2 bg-white border-slate-200 rounded-lg text-slate-700 hover:border-slate-300 hover:text-slate-900 transition duration-150">
+    <button onClick={onClick} className="w-fit px-4 py-2 border flex gap-2 bg-primary border-border rounded-lg hover:shadow transition duration-100">
       <Image width={24} height={24} src={IMAGES[platform]} loading="lazy" alt="google logo" />
       <span>{text}</span>
   </button>

@@ -1,6 +1,7 @@
 import { getDate } from '@/lib/utils'
 import { Email } from '@/types'
-
+import { setAmbientColor } from "@/redux/features/ambient-slice"
+import { useDispatch } from 'react-redux'
 interface ItemProps {
   email: Email
   id: string
@@ -8,19 +9,22 @@ interface ItemProps {
 }
 
 const Item = ({ email, id, handleItemClick } : ItemProps) => {
+  const dispatch = useDispatch();
+  
   const handleClick = () => {
     handleItemClick(id)
+    dispatch(setAmbientColor(email.ambient_color))
   }
 
   return (
   <div 
-    className="w-full flex bg-white px-4 py-2 rounded cursor-pointer border border-zinc-100 hover:shadow duration-100 transition" 
+    className="w-full flex bg-primary px-4 py-2 rounded cursor-pointer border border-border hover:shadow duration-100 transition" 
     onClick={handleClick}
   >
     <div className="w-full grid grid-cols-3 justify-between">
       <p className="font-[525] ">{email.sender}</p>
-      <p className="truncate text-[#52525b]">{email.subject}</p>
-      <p className="text-right text-[#71717a]">{getDate(email.date)}</p>
+      <p className="truncate text-muted-foreground">{email.subject}</p>
+      <p className="text-right text-muted-foreground">{getDate(email.date)}</p>
     </div>
   </div>
   )
