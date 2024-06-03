@@ -85,5 +85,6 @@ def get_emails(access_token: str, email: str):
                 new_emails[id] = email_object
 
     end_time = datetime.now()
-    print(f"Time taken to fetch emails: {end_time - start_time}")
+    print(
+        f"Time taken to fetch emails: {end_time - start_time} with {cpus} cores.")
     return new_emails.items()
