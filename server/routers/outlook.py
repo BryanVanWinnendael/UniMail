@@ -6,11 +6,11 @@ router = APIRouter()
 
 
 @router.get("")
-def get_emails(token: str = Depends(get_bearer_token), refresh_token: str = Header(None), email: str = Header(None), latest_email_time: str = Header(None)):
+def get_user_emails(token: str = Depends(get_bearer_token), email: str = Header(None)):
     try:
         return {
             "data": {
-                "emails": outlook.get_emails(token, email, int(latest_email_time)),
+                "emails": outlook.get_emails(token, email),
                 "user": email,
                 "platform": "outlook"
             }

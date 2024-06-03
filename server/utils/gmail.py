@@ -1,13 +1,12 @@
-from datetime import datetime, timedelta
+from datetime import datetime
+from functools import partial
 from dotenv import load_dotenv
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 import re
 import os
 from collections import OrderedDict
-from utils.cache import load_cache, save_cache
-from utils.colors import get_ambient_color
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from multiprocessing import Pool, cpu_count
 load_dotenv()
 
 
@@ -69,41 +68,33 @@ def get_body(message):
         return "No body"
 
 
-def process_email(service, message_id, latest_email_time):
-    msg = service.users().messages().get(userId='me', id=message_id).execute()
+def process_thread(thread, service, receiver_email):
+    tdata = service.users().threads().get(
+        userId="me", id=thread["id"]).execute()
+    msg = tdata["messages"][0]
 
     timestamp_ms = int(msg["internalDate"])
-    if timestamp_ms <= latest_email_time:
-        return None
-
-    subject = get_subject(msg)
-    sender = get_sender(msg)
-    sender_email = get_sender_email(msg)
     timestamp_s = timestamp_ms / 1000
     date_time = datetime.fromtimestamp(timestamp_s)
 
-    if date_time < datetime.fromtimestamp(latest_email_time / 1000):
-        return None
-
+    id = msg["id"]
+    subject = get_subject(msg)
+    sender = get_sender(msg)
+    sender_email = get_sender_email(msg)
     body = get_body(msg)
-    # ambient_color = get_ambient_color(body)
-    print(f"done processing email {message_id}")
-    return {
-        'id': message_id,
+
+    return id, {
         'subject': subject,
         'sender': sender,
         'sender_email': sender_email,
         'date': date_time,
         'body': body,
-        'ambient_color': "ambient_color"
+        'receiver': receiver_email
     }
 
 
-def get_emails(access_token: str, refresh_token: str, email: str, latest_email_time: int = 0):
-    if latest_email_time == 0:
-        cache = OrderedDict()
-    else:
-        cache = load_cache(email)
+def get_emails(access_token: str, refresh_token: str, email: str):
+    start_time = datetime.now()
 
     credentials = Credentials(
         token=access_token,
@@ -115,30 +106,20 @@ def get_emails(access_token: str, refresh_token: str, email: str, latest_email_t
 
     service = build('gmail', 'v1', credentials=credentials)
 
-    # Calculate the date a day before latest_email_time
-    if latest_email_time > 0:
-        day_before = datetime.fromtimestamp(
-            latest_email_time / 1000) - timedelta(days=1)
-        query = f'after:{day_before.strftime("%Y/%m/%d")} before:{latest_email_time}'
-    else:
-        query = None
-
-    results = service.users().messages().list(userId='me', q=query).execute()
-    messages = results.get('messages', [])
+    threads = service.users().threads().list(
+        userId="me").execute().get("threads", [])
     new_emails = OrderedDict()
-    print("done fetching emails")
 
-    with ThreadPoolExecutor() as executor:
-        future_to_message = {executor.submit(
-            process_email, service, message['id'], latest_email_time): message['id'] for message in messages}
-        for future in as_completed(future_to_message):
-            result = future.result()
-            if result:
-                new_emails[result['id']] = result
+    cpus = cpu_count()
 
-    combined_cache = OrderedDict(
-        list(new_emails.items()) + list(cache.items()))
+    with Pool(cpus) as pool:
+        partial_process_thread = partial(
+            process_thread, service=service, receiver_email=email)
+        result = pool.map(partial_process_thread, threads)
+        for id, email_object in result:
+            if email_object:
+                new_emails[id] = email_object
 
-    save_cache(email, combined_cache)
-
-    return combined_cache
+    end_time = datetime.now()
+    print(f"Time taken to fetch emails: {end_time - start_time}")
+    return new_emails.items()

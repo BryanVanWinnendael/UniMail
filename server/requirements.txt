@@ -4,5 +4,3 @@ google-auth-httplib2==0.2.0
 google-api-python-client==2.130.0
 fastapi==0.111.0
 pytz==2024.1
-beautifulsoup4==4.12.3
-colorthief==0.2.1

@@ -3,17 +3,22 @@ import { getUserEmails } from "@/services/email";
 import { Platforms, UniMails } from "@/types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Toolbar from "../inbox/toolbar";
-import Loading from "../inbox/loading";
 import FilteredEmails from "./filtered-emails";
 import Email from "../inbox/email";
 import { toast } from "sonner";
 import { useAppSelector } from "@/redux/store";
+import useCache from "@/hooks/useCache";
 
 interface IndexProps {
   setEmailsCount: (n: number) => void;
 }
 
 const Index = ({ setEmailsCount } : IndexProps) => {
+  const activeAccount = useAppSelector((state) => state.authReducer.value.activeEmail);
+
+  const { getCache } = useCache();
+  const { getEmailsToken } = useAuth();
+
   const [activeMail, setActiveMail] = useState<{
     email: string;
     id: string;
@@ -23,25 +28,16 @@ const Index = ({ setEmailsCount } : IndexProps) => {
   });
   const [loading, setLoading] = useState<boolean>(true);
   const [userEmails, setUserEmails] = useState<UniMails>({});
-  const emailsCount = useMemo(
-    () =>
-      Object.keys(userEmails).reduce(
-        (acc, email) => acc + Object.keys(userEmails[email].emails).length,
-        0
-      ),
-    [userEmails]
-  );
-  const { getEmailsToken } = useAuth();
-  const scrollPositionRef = useRef<number>(0)
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [hardRefresh, setHardRefresh] = useState<boolean>(true);
-  const activeAccount = useAppSelector(
-    (state) => state.authReducer.value.activeEmail
-  );
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [fullScreenEmail, setFullScreenEmail] = useState(false);
 
+  const scrollPositionRef = useRef<number>(0)
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const fetchingRef = useRef<boolean>(false)
+
+
   const handleBackToInbox = () => {
+    
     setActiveMail({
       email: "",
       id: "",
@@ -62,21 +58,10 @@ const Index = ({ setEmailsCount } : IndexProps) => {
     }
   };
 
-  const refresh = (type: "hard" | "soft") => {
-    if (type === "hard") {
-      const latest_times = localStorage.getItem("latest_time");
-      const latest_times_json = JSON.parse(latest_times || "{}");
-      for (const email in latest_times_json) {
-        latest_times_json[email] = 0;
-      }
 
-      localStorage.setItem("latest_time", JSON.stringify(latest_times_json));
-      setHardRefresh(true)
-    }
-    getEmails(true);
-  };
-
-  const getEmails = useCallback(async (refresh?: boolean) => {
+  const getEmails = useCallback(async (user?: string | null) => {
+    if (fetchingRef.current) return
+    fetchingRef.current = true
     setEmailsCount(0)
     setLoading(true);
     const emailsToken = getEmailsToken();
@@ -87,6 +72,11 @@ const Index = ({ setEmailsCount } : IndexProps) => {
     for (const platform in emailsToken) {
       const emails = emailsToken[platform as Platforms];
       for (const email in emails) {
+        if (user) {
+          if (email !== user) {
+            continue;
+          }
+        }
         const token = emails[email];
         fetchPromises.push(getUserEmails(token, platform as Platforms, email));
       }
@@ -111,38 +101,61 @@ const Index = ({ setEmailsCount } : IndexProps) => {
         } else if (res.data) {
           const email = res.data.user
           newEmails[email] = res.data;
-          
           countNewEmails += Object.keys(res.data.emails).length
         } 
       });
 
-      setLoading(false);
-      
+      fetchingRef.current = false;
       setEmailsCount(countNewEmails);
-      setUserEmails(newEmails);
-
-      if (refresh) {
-        const newEmails = countNewEmails - emailsCount;
-        toast(`You have ${newEmails} new emails`, {
-          action: {
-            label: "Close",
-            onClick: () => console.log("Close"),
-          },
-          classNames: {
-            toast: "!bg-primary",
-          },
-        });
-      }
+      setUserEmails(
+        (prev) => ({
+          ...prev,
+          ...newEmails,
+        }))
     } catch (error) {
       console.error("Error fetching emails:", error);
     }
+    
+    setLoading(false);
+  }, [getEmailsToken, setEmailsCount]);
 
-    setHardRefresh(false);
-  }, [emailsCount, getEmailsToken, setEmailsCount]);
+  const refresh = (user?: string) => {
+    getEmails(user);
+  };
 
   useEffect(() => {
-    getEmails();
-  }, [getEmails, activeAccount]);
+    const getCachedEmails = async () => {
+      const emailsToken = getEmailsToken();
+      const fetchPromises = [];
+
+      for (const platform in emailsToken) {
+        const emails = emailsToken[platform as Platforms];
+        for (const email in emails) {
+          fetchPromises.push(getCache(email));
+        }
+      }
+      try {
+        const results = await Promise.all(fetchPromises);
+        const unimail = {} as UniMails
+        let countEmails = 0
+        results.forEach((res, _) => {
+          const userEmail = res?.user
+          if (userEmail) {
+            countEmails += Object.keys(res.emails).length
+            unimail[userEmail] = res
+          }
+        })
+        setUserEmails(unimail)
+        setEmailsCount(countEmails)
+      } catch (error) {
+        console.error("Error fetching cached emails:", error);
+      }
+    }
+
+    fetchingRef.current = false
+    getCachedEmails()
+    getEmails()
+  }, [activeAccount, getCache, getEmails, getEmailsToken, setEmailsCount])
 
   useEffect(() => {
     if (!activeMail.id) {
@@ -179,9 +192,10 @@ const Index = ({ setEmailsCount } : IndexProps) => {
         <div className="overflow-y-auto h-full"
         ref={scrollContainerRef}
         >
-          {hardRefresh ? <Loading n={10} /> 
-          : (activeMail.id ? <Email fullScreenEmail={fullScreenEmail} setFullScreenEmail={setFullScreenEmail} encoded_body={userEmails[activeMail.email].emails[activeMail.id].body}/> 
-          : <FilteredEmails userEmails={userEmails} searchQuery={searchQuery} handleItemClick={handleItemClick} />)}
+          {
+          activeMail.id ? <Email fullScreenEmail={fullScreenEmail} setFullScreenEmail={setFullScreenEmail} encoded_body={userEmails[activeMail.email].emails[activeMail.id].body}/> 
+          : <FilteredEmails userEmails={userEmails} searchQuery={searchQuery} handleItemClick={handleItemClick} />
+          }
         </div>
       </div>
     </div>

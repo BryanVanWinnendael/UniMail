@@ -13,12 +13,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { getDateTime } from "@/lib/utils";
-import { setAmbientColor } from "@/redux/features/ambient-slice";
 import { useDispatch } from "react-redux";
 
 interface ToolbarProps {
   loading: boolean;
-  refresh: (type: "hard" | "soft") => void;
+  refresh: (user?: string) => void;
   setSearchQuery: (query: string) => void;
   searchQuery: string;
   setFullScreenEmail: (full: boolean) => void;
@@ -37,16 +36,8 @@ interface ToolbarProps {
 }
 
 const Toolbar = ({ loading, refresh, setSearchQuery, searchQuery, setFullScreenEmail, fullScreenEmail, active_email, handleBackToInbox, setEmails, sortType, emails, users } : ToolbarProps) => {
-  const dispatch = useDispatch();
-
-  
   const toggleFullScreen = () => {
     setFullScreenEmail(!fullScreenEmail)
-  }
-
-  const goBack = () => {
-    dispatch(setAmbientColor(null))
-    handleBackToInbox()
   }
 
   return (
@@ -56,17 +47,15 @@ const Toolbar = ({ loading, refresh, setSearchQuery, searchQuery, setFullScreenE
           {
             active_email ? (
               <Tooltip>
-                <TooltipTrigger><ChevronLeft onClick={goBack} className="w-4 h-4 text-ring cursor-pointer" /></TooltipTrigger>
+                <TooltipTrigger><ChevronLeft onClick={handleBackToInbox} className="w-4 h-4 text-ring cursor-pointer" /></TooltipTrigger>
                 <TooltipContent>
                   <p>go back</p>
                 </TooltipContent>
               </Tooltip>
               
             ) :
-            <RefreshButton refresh={refresh} loading={loading}/>
+            <RefreshButton users={users} refresh={refresh} loading={loading}/>
           }
-
-          
           {
             active_email ? (
               <Accordion className="bg-primary p-2 rounded-lg border border-border truncate" type="single" collapsible>

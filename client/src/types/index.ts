@@ -20,7 +20,6 @@ export type Email = {
   receiver: string;
   date: string;
   body: string;
-  ambient_color: [number, number, number];
 }
 
 export type Emails = {

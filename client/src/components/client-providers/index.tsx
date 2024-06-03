@@ -9,10 +9,12 @@ import {
 import AuthProvider from "./auth-provider";
 import ThemeProvider from "./theme-provider";
 
+
 const Index = ({ children }: {children: React.ReactNode}) => {
   return (
     <MsalProvider instance={msalInstance}>
       <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
+       
           <ReduxProvider>
             <TooltipProvider>
               <AuthProvider>
@@ -29,6 +31,7 @@ const Index = ({ children }: {children: React.ReactNode}) => {
           </ReduxProvider>
       </GoogleOAuthProvider>
     </MsalProvider>
+
   );
 };
 

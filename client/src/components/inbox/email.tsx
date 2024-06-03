@@ -14,7 +14,6 @@ interface EmailProps {
 const Email = ({ encoded_body, fullScreenEmail, setFullScreenEmail }: EmailProps) => {
   const decode = (str: string): string => Buffer.from(str, 'base64').toString('utf-8');
   const decoded_body = decode(encoded_body);
-  console.log(encoded_body);
   const toggleFullScreen = () => {
     setFullScreenEmail(!fullScreenEmail);
   }

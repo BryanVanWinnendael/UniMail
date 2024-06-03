@@ -6,10 +6,10 @@ router = APIRouter()
 
 
 @router.get("")
-def get_emails(token: str = Depends(get_bearer_token), refresh_token: str = Header(None), email: str = Header(None), latest_email_time: str = Header(None)):
+def get_user_emails(token: str = Depends(get_bearer_token), refresh_token: str = Header(None), email: str = Header(None)):
     try:
         emails = gmail.get_emails(
-            token, refresh_token, email, int(latest_email_time))
+            token, refresh_token, email)
         return {
             "data": {
                 "emails": emails,

@@ -8,6 +8,7 @@ import { useAppSelector } from "@/redux/store";
 import { useCallback } from "react";
 import { loginRequest } from "@/config/msal";
 import { useMsal } from "@azure/msal-react";
+import useCache from "./useCache";
 
 type PlatformsEmails= {
   [key in Platforms]: string[];
@@ -19,6 +20,7 @@ const useAuth = () => {
   const dispatch = useDispatch();
   const activeEmail = useAppSelector((state) => state.authReducer.value.activeEmail) || ""
   const cookies = useCookies()
+  const { removeCache } = useCache()
 
   const getAccounts = useCallback((): string[] => {
     const accountsEncr = cookies.get("accounts")
@@ -44,7 +46,8 @@ const useAuth = () => {
       accounts.splice(index, 1)
     }
     localStorage.setItem("accounts", btoa(JSON.stringify(accounts)))
-  },[getAccounts])
+    removeCache(email)
+  },[getAccounts, removeCache])
 
   const getTokens = useCallback((): Tokens => {
     if (typeof localStorage === 'undefined') {

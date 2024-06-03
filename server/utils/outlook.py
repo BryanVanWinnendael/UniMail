@@ -1,11 +1,11 @@
 import base64
 from collections import OrderedDict
+from functools import partial
+from multiprocessing import Pool, cpu_count
 import os
 from dotenv import load_dotenv
 import requests
-from datetime import datetime, timedelta, timezone
-from utils.colors import get_ambient_color
-from utils.cache import load_cache, save_cache
+from datetime import datetime
 import pytz
 
 load_dotenv()
@@ -20,82 +20,70 @@ def encode_to_base64(content):
     return base64.b64encode(content.encode()).decode("utf-8")
 
 
-def get_emails(access_token: str, email: str, latest_email_time: int = 0):
-    if latest_email_time == 0:
-        cache = OrderedDict()
+def process_thread(mail, email):
+    id = mail.get('id')
+    subject = mail.get('subject', 'No Subject')
+    sender_info = mail.get('sender', {}).get('emailAddress', {})
+    sender = sender_info.get('name', 'Unknown Sender')
+    sender_email = sender_info.get('address', 'Unknown Sender')
+
+    received_date_time = mail.get('receivedDateTime')
+    if received_date_time:
+        try:
+            date_time = datetime.strptime(
+                received_date_time, "%Y-%m-%dT%H:%M:%SZ")
+        except ValueError:
+            date_time = None
     else:
-        cache = load_cache(email)
+        date_time = None
+
+    content = mail.get('body', {}).get('content', '')
+    body = encode_to_base64(content)
+
+    return id, {
+        'subject': subject,
+        'sender': sender,
+        'sender_email': sender_email,
+        'date': date_time.replace(tzinfo=pytz.UTC),
+        'body': body,
+        'receiver': email,
+    }
+
+
+def get_emails(access_token: str, email: str):
+    start_time = datetime.now()
 
     headers = {
         'Authorization': f'Bearer {access_token}'
     }
-    latest_email_time_utc = datetime.fromtimestamp(
-        latest_email_time / 1000)
-    # Convert latest_email_time from milliseconds to datetime with UTC timezone
-    if latest_email_time > 0:
-        query = (
-            f"$filter=receivedDateTime gt {latest_email_time_utc.strftime('%Y-%m-%dT%H:%M:%SZ')}"
-            "&$select=subject,receivedDateTime,sender,body"
-            "&$top=500"
-        )
-        endpoint = f"{base_url}me/messages?{query}"
-    else:
-        query = (
-            "$select=subject,receivedDateTime,sender,body"
-            "&$top=500"
-        )
-        endpoint = f"{base_url}me/messages?{query}"
+
+    query = (
+        "$select=subject,receivedDateTime,sender,body"
+        "&$top=500"
+    )
+    endpoint = f"{base_url}me/messages?{query}"
 
     try:
         response = requests.get(endpoint, headers=headers)
         response.raise_for_status()
     except requests.RequestException as e:
         print(f"Error fetching emails: {e}")
-        return cache  # Return the existing cache if there's an error
+        return {}
 
     json = response.json()
     mails = json.get('value', [])
     new_emails = OrderedDict()
-    for mail in mails:
-        id = mail.get('id')
-        subject = mail.get('subject', 'No Subject')
-        sender_info = mail.get('sender', {}).get('emailAddress', {})
-        sender = sender_info.get('name', 'Unknown Sender')
-        sender_email = sender_info.get('address', 'Unknown Sender')
 
-        received_date_time = mail.get('receivedDateTime')
-        if received_date_time:
-            try:
-                date_time = datetime.strptime(
-                    received_date_time, "%Y-%m-%dT%H:%M:%SZ")
-            except ValueError:
-                date_time = None
-        else:
-            date_time = None
+    cpus = cpu_count()
 
-        # Only consider emails after the latest_email_time in UTC
-        if date_time and date_time <= latest_email_time_utc:
-            continue
+    with Pool(cpus) as pool:
+        partial_process_thread = partial(
+            process_thread, email=email)
+        result = pool.map(partial_process_thread, mails)
+        for id, email_object in result:
+            if email_object:
+                new_emails[id] = email_object
 
-        content = mail.get('body', {}).get('content', '')
-        body = encode_to_base64(content)
-
-        ambient_color = get_ambient_color(body)
-
-        new_emails[id] = {
-            'subject': subject,
-            'sender': sender,
-            'sender_email': sender_email,
-            'date': date_time.replace(tzinfo=pytz.UTC),
-            'body': body,
-            'receiver': email,
-            'ambient_color': ambient_color
-        }
-
-    combined_cache = OrderedDict(
-        list(new_emails.items()) + list(cache.items())
-    )
-
-    save_cache(email, combined_cache)
-
-    return combined_cache
+    end_time = datetime.now()
+    print(f"Time taken to fetch emails: {end_time - start_time}")
+    return new_emails.items()

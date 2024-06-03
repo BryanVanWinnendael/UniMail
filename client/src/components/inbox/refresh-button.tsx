@@ -12,15 +12,18 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { Platforms, Tokens } from "@/types";
 
 interface RefreshButtonProps {
   loading: boolean
-  refresh: (type: "hard"| "soft") => void
+  refresh: (user?: string) => void
+  users?: Tokens;
 }
 
-const RefreshButton = ({ loading, refresh }: RefreshButtonProps) => {
+const RefreshButton = ({ loading, refresh, users }: RefreshButtonProps) => {
   return (
-    <DropdownMenu>
+    users ? 
+      <DropdownMenu>
       <DropdownMenuTrigger disabled={loading}>
         {
           loading ? <Spinner size={4}/> : 
@@ -34,24 +37,31 @@ const RefreshButton = ({ loading, refresh }: RefreshButtonProps) => {
         }
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => refresh("soft")}>
-        <Tooltip>
-          <TooltipTrigger className="w-full text-left">Soft</TooltipTrigger>
+      {
+        Object.keys(users).map((platform) => (
+          Object.keys(users[platform as Platforms]).map((email) => (
+            <DropdownMenuItem key={email} onClick={() => refresh(email)}>
+               <Tooltip>
+          <TooltipTrigger className="w-full text-left">{email}</TooltipTrigger>
           <TooltipContent>
-            <p>only refresh uncached emails</p>
+            <p>{email}</p>
           </TooltipContent>
         </Tooltip>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => refresh("hard")}>
-        <Tooltip>
-          <TooltipTrigger className="w-full text-left">Force</TooltipTrigger>
-          <TooltipContent>
-            <p>refresh all emails</p>
-          </TooltipContent>
-        </Tooltip>
-        </DropdownMenuItem>
+            </DropdownMenuItem>
+          ))
+        ))
+      }
       </DropdownMenuContent>
     </DropdownMenu>
+      : 
+      
+        loading ? <Spinner size={4}/> : 
+        <Tooltip>
+        <TooltipTrigger className="w-fit text-left"> <RefreshCcw onClick={() => refresh()} className="w-4 h-4 text-ring"/></TooltipTrigger>
+        <TooltipContent>
+          <p>refresh</p>
+        </TooltipContent>
+        </Tooltip>
   )
 }
 

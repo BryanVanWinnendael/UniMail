@@ -1,13 +1,13 @@
 import useAuth from "@/hooks/useAuth"
 import { getUserEmails } from "@/services/email"
 import { UserEmails } from "@/types"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import Toolbar from "./toolbar"
 import { useAppSelector } from "@/redux/store"
-import Loading from "./loading"
 import { toast } from "sonner"
 import EmailList from "./email-list"
 import Email from "./email"
+import useCache from "@/hooks/useCache"
 
 const DEFAULT_EMAILS: UserEmails = {
   user: "",
@@ -20,17 +20,21 @@ interface IndexProps {
 }
 
 const Index = ({ setEmailsCount } : IndexProps) => {
+  const activeAccount = useAppSelector((state) => state.authReducer.value.activeEmail)
+
+  const { getCache, updateCache } = useCache()
+  const { getActiveAccessToken } = useAuth()
+
   const [loading, setLoading] = useState<boolean>(true)
   const [userEmails, setUserEmails] = useState<UserEmails>(DEFAULT_EMAILS)
-  const countEmails = useMemo(() => Object.keys(userEmails.emails).length, [userEmails])
-  const [activeMail, setActiveMail] = useState<string>("")
-  const { getActiveAccessToken } = useAuth()
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const scrollPositionRef = useRef<number>(0)
-  const activeAccount = useAppSelector((state) => state.authReducer.value.activeEmail)
-  const [hardRefresh, setHardRefresh] = useState<boolean>(true)
+  const [activeMail, setActiveMail] = useState<string>("") // selected mail to view
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [fullScreenEmail, setFullScreenEmail] = useState(false);
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const scrollPositionRef = useRef<number>(0)
+  const fetchingRef = useRef<boolean>(false)
+  const activeRef = useRef<string>(activeAccount) // used for checking if the active account has changed
 
   const handleItemClick = (id: string) => {
     if (scrollContainerRef.current) {
@@ -47,7 +51,10 @@ const Index = ({ setEmailsCount } : IndexProps) => {
     }
   }
 
-  const getEmails = useCallback(async (refresh?: boolean) => {
+  const getEmails = useCallback(async () => {
+    if (fetchingRef.current) return
+
+    fetchingRef.current = true
     setEmailsCount(0)
     setActiveMail("")
     setLoading(true)
@@ -69,58 +76,35 @@ const Index = ({ setEmailsCount } : IndexProps) => {
         },
       })
     } else if (res.data) {
+      if (activeRef.current !== res.data.user) return
       const data = res.data
       const emails = data.emails
+      updateCache(activeAccount, data)
       setUserEmails(data)
       setEmailsCount(Object.keys(emails).length)
-
-      if (refresh) {
-        const countNewEmails = Object.keys(emails).length
-        const newEmails = countNewEmails - countEmails
-
-        toast(`You have ${newEmails} new emails`, {
-          action: {
-            label: "Close",
-            onClick: () => console.log("Close"),
-          },
-          classNames: {
-            toast: "!bg-primary",
-          },
-        })
-      }
-
-      const latest_times = localStorage.getItem("latest_time")
-      const latest_times_json = JSON.parse(latest_times || "{}")
-
-      const latest_time = Math.max(...Object.values(emails).map((email) => {
-        if (!email.date) {
-          return 0
-        }
-        return new Date(email.date).getTime()
-      }))
-
-      latest_times_json[activeAccount] = latest_time
-      localStorage.setItem("latest_time", JSON.stringify(latest_times_json))
     }
 
+    fetchingRef.current = false
     setLoading(false)
-    setHardRefresh(false)
-  },[activeAccount, getActiveAccessToken, setEmailsCount, countEmails])
+  },[setEmailsCount, getActiveAccessToken, activeAccount, updateCache])
 
-  const refresh = (type: "hard" | "soft") => {
-    if (type === "hard") {
-      const latest_times = localStorage.getItem("latest_time")
-      const latest_times_json = JSON.parse(latest_times || "{}")
-      latest_times_json[activeAccount] = 0
-      localStorage.setItem("latest_time", JSON.stringify(latest_times_json))
-      setHardRefresh(true)
-    }
-    getEmails(true)
+  const refresh = () => {
+    getEmails()
   }
 
+  const getCachedEmails = useCallback(async () => {
+    const cachedEmails = await getCache(activeAccount)
+    if (cachedEmails) {
+      setUserEmails(cachedEmails)
+      setEmailsCount(Object.keys(cachedEmails.emails).length)
+    }
+  },[activeAccount, getCache, setEmailsCount])
+ 
   useEffect(() => {
+    fetchingRef.current = false
+    getCachedEmails()
     getEmails()
-  }, [activeAccount, getEmails])
+  }, [activeAccount, getCachedEmails, getEmails])
 
   useEffect(() => {
     if (!activeMail) {
@@ -137,17 +121,28 @@ const Index = ({ setEmailsCount } : IndexProps) => {
       >
         <Toolbar 
           emails={userEmails} 
-          sortType="user" setEmails={setUserEmails} searchQuery={searchQuery} handleBackToInbox={handleBackToInbox} 
-          active_email={userEmails.emails[activeMail] ? {
-            from:  userEmails.emails[activeMail].sender_email,
-            to: userEmails.emails[activeMail].receiver,
-            subject: userEmails.emails[activeMail].subject,
-            date: userEmails.emails[activeMail].date
-          } : null} fullScreenEmail={fullScreenEmail} 
-          setFullScreenEmail={setFullScreenEmail} loading={loading} refresh={refresh} setSearchQuery={setSearchQuery} />
+          sortType="user" 
+          setEmails={setUserEmails} 
+          searchQuery={searchQuery} 
+          handleBackToInbox={handleBackToInbox} 
+          active_email={
+            userEmails.emails[activeMail] ? 
+            {
+              from:  userEmails.emails[activeMail].sender_email,
+              to: userEmails.emails[activeMail].receiver,
+              subject: userEmails.emails[activeMail].subject,
+              date: userEmails.emails[activeMail].date
+            } 
+            : null
+          } 
+          fullScreenEmail={fullScreenEmail} 
+          setFullScreenEmail={setFullScreenEmail} 
+          loading={loading} 
+          refresh={refresh} 
+          setSearchQuery={setSearchQuery} 
+        />
         <div className="overflow-y-auto h-full" ref={scrollContainerRef}>
-          {hardRefresh ? <Loading n={10} /> 
-          : 
+          {
             (activeMail ? <Email fullScreenEmail={fullScreenEmail} setFullScreenEmail={setFullScreenEmail} encoded_body={userEmails.emails[activeMail].body}/> 
             : <EmailList emails={userEmails.emails} searchQuery={searchQuery} handleItemClick={handleItemClick} />)
           }

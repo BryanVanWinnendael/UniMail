@@ -19,7 +19,7 @@ const Page = () => {
             <p className="text-sm capitalize">UniBox</p>
             {
               emailsCount > 0 && (
-                <Badge variant="outline" className="bg-blue-300/50 dark:bg-blue-400/50 text-blue-500 dark:text-blue-600">
+                <Badge className="bg-blue-300/50 dark:bg-blue-500/50 text-blue-500 dark:text-blue-400">
                   {emailsCount}
                 </Badge>
               )

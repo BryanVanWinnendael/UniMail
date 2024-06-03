@@ -1,4 +1,4 @@
-import { Emails, UniMails, UserEmails } from "@/types";
+import { Emails } from "@/types";
 
 export const dateSortUserMails = (emails: Emails, type: "asc" | "desc"): Emails  => {
   const sorted = Object.keys(emails).sort((a, b) => {

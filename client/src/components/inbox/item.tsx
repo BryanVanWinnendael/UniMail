@@ -1,7 +1,7 @@
 import { getDate } from '@/lib/utils'
 import { Email } from '@/types'
-import { setAmbientColor } from "@/redux/features/ambient-slice"
 import { useDispatch } from 'react-redux'
+
 interface ItemProps {
   email: Email
   id: string
@@ -13,7 +13,6 @@ const Item = ({ email, id, handleItemClick } : ItemProps) => {
   
   const handleClick = () => {
     handleItemClick(id)
-    dispatch(setAmbientColor(email.ambient_color))
   }
 
   return (
