@@ -7,7 +7,7 @@ enum EnumPlatforms {
 
 export const getUserEmails = async (token: TokenObject, type: Platforms, email: string): Promise<EmailResponse> => {
   const platform = EnumPlatforms[type]
-  const API_URL = process.env.NEXT_PUBLIC_API_URL
+  const API_URL = '/api/proxy/'
   return await fetch(API_URL + platform, {
     headers: {
       "Content-Type": "application/json",
