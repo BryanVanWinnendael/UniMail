@@ -69,9 +69,9 @@ def get_emails(access_token: str, email: str):
     except requests.RequestException as e:
         print(f"Error fetching emails: {e}")
         return {}
-
     json = response.json()
     mails = json.get('value', [])
+    print(f"Total emails fetched: {len(mails)}")
     new_emails = OrderedDict()
 
     cpus = cpu_count()
