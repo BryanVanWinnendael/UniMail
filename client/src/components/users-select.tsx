@@ -12,21 +12,27 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import useAuth from "@/hooks/useAuth"
 import { useAppSelector } from "@/redux/store"
 import { useDispatch } from "react-redux"
 import { setActiveEmail } from "@/redux/features/auth-slice"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
-
+import { PlatformsEmails } from "@/types"
+import Loading from "./inbox/loading"
 
 const UsersSelect = () => {
   const { getEmails } = useAuth()
   const dispatch = useDispatch();
-  const emails = getEmails()
+  const [emails, setEmails] = useState<PlatformsEmails>({
+    google: [],
+    outlook: [],
+  })
   const [open, setOpen] = useState(false)
   const activeEmail = useAppSelector((state) => state.authReducer.value.activeEmail)
   const [value, setValue] = useState<string>(activeEmail)
+
+  const fetchingRef = useRef<boolean>(false)
   
   const handleSwitchAccount = (email: string) => {
     dispatch(setActiveEmail(email))
@@ -38,7 +44,16 @@ const UsersSelect = () => {
     setValue(activeEmail)
   }, [activeEmail])
 
+  useEffect(() => {
+    if (fetchingRef.current) return
+    const emails = getEmails()
+    if (!emails) return
+    setEmails(emails)
+    fetchingRef.current = true
+  }, [getEmails])
+
   return (
+    value ?
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
@@ -94,6 +109,7 @@ const UsersSelect = () => {
         </Command>
       </PopoverContent>
     </Popover>
+    : <Loading n={1} h="40px" w="193px"/>
   )
 }
 

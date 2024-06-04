@@ -14,9 +14,9 @@ const Page = () => {
   return (
     <div className="flex flex-col overflow-hidden h-screen">
       <div className="w-full mt-2 sm:pl-0 pl-4 pr-4 pb-2">
-          <div className="h-full rounded py-1 flex gap-1 items-center justify-center bg-white dark:bg-black">
+          <div className="h-full rounded py-1 flex gap-1 items-center justify-center bg-primary">
           <Mails className="w-4 h-4 text-blue-500"/>
-            <p className="text-sm capitalize">UniBox</p>
+            <p className="text-sm">UniBox</p>
             {
               emailsCount > 0 && (
                 <Badge className="bg-blue-300/50 dark:bg-blue-500/50 text-blue-500 dark:text-blue-400">
