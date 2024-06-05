@@ -167,8 +167,7 @@ const SortButton = ({ setEmails, sortType, emails }: SortButtonProps) => {
           </TooltipContent>
         </Tooltip>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
-
+      <DropdownMenuContent className="bg-primary">
         {
           TYPES.map((type) => (
             <DropdownMenuItem key={type.name} onClick={() => handleSort(type.name)}>

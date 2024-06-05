@@ -1,4 +1,14 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+
+
+const getActiveEmail = () => {
+  const favoriteAccount = (typeof localStorage != 'undefined') ? localStorage.getItem("favoriteAccount") ?? "" : "";
+  if (favoriteAccount === "none" || !favoriteAccount) {
+    return (typeof localStorage != 'undefined') ? localStorage.getItem("activeEmail") ?? "" : "";
+  }
+  localStorage.setItem("activeEmail", favoriteAccount);
+  return favoriteAccount;
+}
 
 type InitialState = {
   value: {
@@ -8,7 +18,7 @@ type InitialState = {
 
 const initialState: InitialState = {
   value: {
-    activeEmail: (typeof localStorage != 'undefined') ? localStorage.getItem("activeEmail") ?? "" : "",
+    activeEmail: getActiveEmail(),
   }
 }
 
@@ -16,7 +26,7 @@ export const auth = createSlice({
   name: 'auth',
   initialState: initialState,
   reducers: {
-    setActiveEmail: (state, action: PayloadAction<string>) => {
+    setActiveEmail: (state, action) => {
       localStorage.setItem("activeEmail", action.payload);
       state.value.activeEmail = action.payload;
     }

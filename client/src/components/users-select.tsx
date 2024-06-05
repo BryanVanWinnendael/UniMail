@@ -18,42 +18,22 @@ import { useAppSelector } from "@/redux/store"
 import { useDispatch } from "react-redux"
 import { setActiveEmail } from "@/redux/features/auth-slice"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
-import { PlatformsEmails } from "@/types"
 import Loading from "./inbox/loading"
 
 const UsersSelect = () => {
   const { getEmails } = useAuth()
   const dispatch = useDispatch();
-  const [emails, setEmails] = useState<PlatformsEmails>({
-    google: [],
-    outlook: [],
-  })
+  const emails = getEmails()
   const [open, setOpen] = useState(false)
   const activeEmail = useAppSelector((state) => state.authReducer.value.activeEmail)
-  const [value, setValue] = useState<string>(activeEmail)
 
-  const fetchingRef = useRef<boolean>(false)
-  
   const handleSwitchAccount = (email: string) => {
     dispatch(setActiveEmail(email))
-    setValue(email)
     setOpen(false)
   }
 
-  useEffect(() => {
-    setValue(activeEmail)
-  }, [activeEmail])
-
-  useEffect(() => {
-    if (fetchingRef.current) return
-    const emails = getEmails()
-    if (!emails) return
-    setEmails(emails)
-    fetchingRef.current = true
-  }, [getEmails])
-
   return (
-    value ?
+    activeEmail ?
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
@@ -63,9 +43,9 @@ const UsersSelect = () => {
           className="w-full justify-between"
         >
           <Tooltip>
-            <TooltipTrigger className="overflow-hidden"> <p className="overflow-hidden text-ellipsis whitespace-nowrap"> {value}</p></TooltipTrigger>
+            <TooltipTrigger className="overflow-hidden"> <p className="overflow-hidden text-ellipsis whitespace-nowrap"> {activeEmail}</p></TooltipTrigger>
             <TooltipContent>
-              <p>{value}</p>
+              <p>{activeEmail}</p>
             </TooltipContent>
           </Tooltip>
           
@@ -74,7 +54,7 @@ const UsersSelect = () => {
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandList>
+          <CommandList className="bg-primary">
             <CommandGroup>
               {
                 Object.entries(emails).map(([platform, platformEmails]) => {
@@ -90,7 +70,7 @@ const UsersSelect = () => {
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4 text-main",
-                          value === email ? "opacity-100" : "opacity-0"
+                          activeEmail === email ? "opacity-100" : "opacity-0"
                         )}
                       />
                       <Tooltip>

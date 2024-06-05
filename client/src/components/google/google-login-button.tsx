@@ -45,7 +45,7 @@ const GoogleLoginButton = () => {
   })
 
   return (
-    <EmailButton onClick={handleLogin} platform="google" text="Add Account with Google"/>
+    <EmailButton onClick={handleLogin} platform="google" text=""/>
   )
 }
 

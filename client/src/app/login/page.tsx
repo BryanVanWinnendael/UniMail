@@ -1,5 +1,6 @@
 import GoogleLoginButton from "@/components/google/google-login-button";
 import OutlookLoginButton from "@/components/outlook/outlook-login-button";
+import YahooLoginButton from "@/components/yahoo/yahoo-login";
 
 const Page = () => {
   return (
@@ -12,6 +13,7 @@ const Page = () => {
         <div className="flex flex-col gap-2">
           <GoogleLoginButton />
           <OutlookLoginButton />
+          <YahooLoginButton />
         </div>
       </div>
     </div>

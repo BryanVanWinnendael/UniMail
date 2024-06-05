@@ -33,7 +33,7 @@ const OutlookLoginButton = () => {
   }
   
   return (
-    <EmailButton onClick={handleLogin} platform="outlook" text="Add Account with Outlook"/>
+    <EmailButton onClick={handleLogin} platform="outlook" text=""/>
   )
 }
 

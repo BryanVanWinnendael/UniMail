@@ -34,7 +34,6 @@ const Index = ({ setEmailsCount } : IndexProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const scrollPositionRef = useRef<number>(0)
   const fetchingRef = useRef<boolean>(false)
-  const activeRef = useRef<string>(activeAccount) // used for checking if the active account has changed
 
   const handleItemClick = (id: string) => {
     if (scrollContainerRef.current) {
@@ -76,7 +75,11 @@ const Index = ({ setEmailsCount } : IndexProps) => {
         },
       })
     } else if (res.data) {
-      if (activeRef.current !== res.data.user) return
+      if (localStorage.getItem("activeEmail") !== res.data.user) {
+        fetchingRef.current = false
+        setLoading(false)
+        return
+      }
       const data = res.data
       const emails = data.emails
       updateCache(activeAccount, data)
@@ -93,12 +96,13 @@ const Index = ({ setEmailsCount } : IndexProps) => {
   }
 
   const getCachedEmails = useCallback(async () => {
-    const cachedEmails = await getCache(activeAccount)
+    const acc = localStorage.getItem("activeEmail") ?? ""
+    const cachedEmails = await getCache(acc)
     if (cachedEmails) {
       setUserEmails(cachedEmails)
       setEmailsCount(Object.keys(cachedEmails.emails).length)
     }
-  },[activeAccount, getCache, setEmailsCount])
+  },[getCache, setEmailsCount])
  
   useEffect(() => {
     fetchingRef.current = false

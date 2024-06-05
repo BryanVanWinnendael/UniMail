@@ -1,11 +1,11 @@
 export const getAccessRefreshToken = async (code: string) => {
-  const TOKEN_URL = 'https://oauth2.googleapis.com/token'
-  const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-  const CLIENT_SECRET = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET
-  const REDIRECT_URI = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
+  const TOKEN_URL = 'https://api.login.yahoo.com/oauth2/get_token'
+  const CLIENT_ID = process.env.NEXT_PUBLIC_YAHOO_CLIENT_ID
+  const CLIENT_SECRET = process.env.NEXT_PUBLIC_YAHOO_CLIENT_SECRET
+  const REDIRECT_URI = process.env.NEXT_PUBLIC_YAHOO_REDIRECT_URI
 
   if (!CLIENT_ID || !CLIENT_SECRET) {
-    throw new Error('Missing Google Client ID or Client Secret');
+    throw new Error('Missing Yahoo Client ID or Client Secret');
   }
   
   const data = {
@@ -21,7 +21,7 @@ export const getAccessRefreshToken = async (code: string) => {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: new URLSearchParams(data as any).toString()
+    body: new URLSearchParams(data as any).toString(),
   })
 
   const responseBody = await response.text();

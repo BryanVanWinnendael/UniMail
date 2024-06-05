@@ -1,4 +1,4 @@
-export type Platforms = "google" | "outlook" 
+export type Platforms = "google" | "outlook"  | "yahoo"
 
 export type TokenObject ={
   access_token: string;
