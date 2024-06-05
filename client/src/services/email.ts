@@ -3,6 +3,7 @@ import { EmailResponse, Platforms, TokenObject } from "@/types"
 enum EnumPlatforms {
   google = 'gmail',
   outlook = 'outlook',
+  yahoo = 'yahoo'
 }
 
 export const getUserEmails = async (token: TokenObject, type: Platforms, email: string): Promise<EmailResponse> => {
