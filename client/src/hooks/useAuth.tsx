@@ -53,7 +53,8 @@ const useAuth = () => {
     if (typeof localStorage === 'undefined') {
       return {
         google: {},
-        outlook: {}
+        outlook: {},
+        yahoo: {}
       };
     }
     
@@ -64,7 +65,8 @@ const useAuth = () => {
     }
     return {
       google: {},
-      outlook: {}
+      outlook: {},
+      yahoo: {}
     }
   },[])
 
@@ -127,7 +129,8 @@ const useAuth = () => {
     const tokens = getTokens()
     const emails: PlatformsEmails = {
       google: [],
-      outlook: []
+      outlook: [],
+      yahoo: []
     }
 
     for (const platform of Object.keys(tokens)) {
