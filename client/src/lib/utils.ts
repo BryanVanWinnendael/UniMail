@@ -71,4 +71,14 @@ export const PLATFORM_COLOR: { [key in Platforms]: {
       "text": "#aba7ee"
     }
   },
+  "yahoo": {
+    "light": {
+      "bg": "#f8f7ff",
+      "text": "#7f7f7f"
+    },
+    "dark": {
+      "bg": "#f8f7ff",
+      "text": "#7f7f7f"
+    }
+  }
 }
