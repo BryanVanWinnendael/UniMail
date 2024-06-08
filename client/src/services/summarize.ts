@@ -1,22 +1,22 @@
-import { SummarizeResponse } from "@/types";
+import { SummarizeResponse } from "@/types"
 
 export const summarize = async (text: string): Promise<SummarizeResponse> => {
-  const token = localStorage.getItem('api_key');
-  if (!token) return { error: { response: 'No API key found' } };
+  const token = localStorage.getItem("api_key")
+  if (!token) return { error: { response: "No API key found" } }
 
-  const url = process.env.NEXT_PUBLIC_API_URL + 'summarize'
+  const url = process.env.NEXT_PUBLIC_API_URL + "summarize"
   return fetch(url, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ text })
+    body: JSON.stringify({ text }),
   })
-    .then(res => {
+    .then((res) => {
       return res.json()
     })
-    .catch(error => {
+    .catch((error) => {
       return { error }
-    });
+    })
 }

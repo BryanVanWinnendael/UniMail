@@ -19,7 +19,6 @@ const ApiKey = () => {
     setVal(e.target.value)
     localStorage.setItem("api_key", e.target.value)
   }
-  
 
   return (
     <Dialog>
@@ -38,7 +37,13 @@ const ApiKey = () => {
             <Label htmlFor="key" className="text-right">
               API Key
             </Label>
-            <Input onChange={handleChange} type="password" id="key" value={val} className="col-span-3" />
+            <Input
+              onChange={handleChange}
+              type="password"
+              id="key"
+              value={val}
+              className="col-span-3"
+            />
           </div>
         </div>
         <DialogFooter>

@@ -55,7 +55,7 @@ export type PlatformsEmails = {
 }
 
 export type SummarizeResponse = {
-  data?:{
+  data?: {
     response: string
   }
   error?: {

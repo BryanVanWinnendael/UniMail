@@ -44,7 +44,12 @@ const General = () => {
 
       <div className="w-full grid justify-between grid-cols-[0.7fr_0.3fr] mt-6">
         <div className="w-full flex flex-col">
-          <p className="text-lg font-semibold flex gap-1 items-center">Summarizer API Key <Link target="_blank" href="https://console.groq.com/keys"><SquareArrowOutUpRight className="w-4 h-4 text-indigo-500 dark:text-indigo-400"/></Link></p>
+          <p className="text-lg font-semibold flex gap-1 items-center">
+            Summarizer API Key{" "}
+            <Link target="_blank" href="https://console.groq.com/keys">
+              <SquareArrowOutUpRight className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
+            </Link>
+          </p>
           <p className="text-muted-foreground">
             Add your API key for the summarizer.
           </p>

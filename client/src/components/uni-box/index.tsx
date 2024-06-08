@@ -133,12 +133,12 @@ const Index = ({ setEmailsCount }: IndexProps) => {
 
   const summarizeText = async () => {
     if (!activeMail) return { data: { response: "" } }
-    const encoded_body =  userEmails[activeMail.email].emails[activeMail.id].body
+    const encoded_body = userEmails[activeMail.email].emails[activeMail.id].body
     const decode = (str: string): string =>
       Buffer.from(str, "base64").toString("utf-8")
     const decoded_body = decode(encoded_body)
     return await summarize(decoded_body)
-  } 
+  }
 
   useEffect(() => {
     const getCachedEmails = async () => {

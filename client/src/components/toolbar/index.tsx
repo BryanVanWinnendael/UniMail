@@ -115,7 +115,7 @@ const Index = ({
           {users && !active_email && <UsersScroll users={users} />}
           {active_email ? (
             <div className="flex gap-2">
-              <Summarize summarizeText={summarizeText}/>
+              <Summarize summarizeText={summarizeText} />
               <Tooltip>
                 <TooltipTrigger>
                   <Maximize2

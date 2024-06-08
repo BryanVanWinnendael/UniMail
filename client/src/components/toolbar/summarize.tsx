@@ -2,7 +2,14 @@ import { SummarizeResponse } from "@/types"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 import { Sparkles } from "lucide-react"
 import { toast } from "sonner"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog"
 import { Input } from "postcss"
 import { Button } from "../ui/button"
 import { useState } from "react"
@@ -18,7 +25,7 @@ const Summarize = ({ summarizeText }: SummarizeProps) => {
 
   const handleSummarize = async () => {
     const res = await summarizeText()
-    if (res.data){
+    if (res.data) {
       setText(res.data.response)
       setOpen(true)
       return
@@ -43,31 +50,29 @@ const Summarize = ({ summarizeText }: SummarizeProps) => {
 
   return (
     <>
-     <Tooltip>
-    <TooltipTrigger>
-      <Sparkles
-        className="w-4 h-4 text-ring cursor-pointer"
-        onClick={handleSummarize}
-      />
-    </TooltipTrigger>
-    <TooltipContent>
-      <p>summarize email</p>
-    </TooltipContent>
-  </Tooltip>
+      <Tooltip>
+        <TooltipTrigger>
+          <Sparkles
+            className="w-4 h-4 text-ring cursor-pointer"
+            onClick={handleSummarize}
+          />
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>summarize email</p>
+        </TooltipContent>
+      </Tooltip>
 
-     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Summarized email</DialogTitle>
-        </DialogHeader>
-        <div>
-          <StreamText text={text} speed={10} />
-        </div>
-      </DialogContent>
-    </Dialog>
-
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Summarized email</DialogTitle>
+          </DialogHeader>
+          <div>
+            <StreamText text={text} speed={10} />
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
-   
   )
 }
 
