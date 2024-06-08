@@ -6,3 +6,4 @@ fastapi==0.111.0
 pytz==2024.1
 imaplib2==3.6
 groq==0.8.0
+beautifulsoup4==4.12.3
