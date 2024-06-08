@@ -14,7 +14,7 @@ def get_user_emails(token: str = Depends(get_bearer_token), refresh_token: str =
             "data": {
                 "emails": emails,
                 "user": email,
-                "platform": "google"
+                "platform": "gmail"
             }
         }
     except Exception as e:

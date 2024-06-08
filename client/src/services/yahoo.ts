@@ -1,33 +1,41 @@
 export const getAccessRefreshToken = async (code: string) => {
-  const TOKEN_URL = 'https://api.login.yahoo.com/oauth2/get_token'
-  const CLIENT_ID = process.env.NEXT_PUBLIC_YAHOO_CLIENT_ID
-  const CLIENT_SECRET = process.env.NEXT_PUBLIC_YAHOO_CLIENT_SECRET
-  const REDIRECT_URI = process.env.NEXT_PUBLIC_YAHOO_REDIRECT_URI
+  const TOKEN_URL = "/api/proxy/access/yahoo"
 
-  if (!CLIENT_ID || !CLIENT_SECRET) {
-    throw new Error('Missing Yahoo Client ID or Client Secret');
-  }
-  
   const data = {
-    'code': code,
-    'client_id': CLIENT_ID,
-    'client_secret': CLIENT_SECRET,
-    'redirect_uri': REDIRECT_URI,
-    'grant_type': 'authorization_code'
+    code,
   }
 
   const response = await fetch(TOKEN_URL, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+      "Content-Type": "application/json",
     },
-    body: new URLSearchParams(data as any).toString(),
+    body: JSON.stringify(data),
   })
 
-  const responseBody = await response.text();
-  const parsedBody = JSON.parse(responseBody)
-  const { access_token, refresh_token } = parsedBody
+  const parsedBody = await response.json()
+  const { access_token, refresh_token, email } = parsedBody
 
-  return { access_token, refresh_token }
+  return { access_token, refresh_token, email }
 }
 
+export const refreshAccessToken = async (refresh_token: string) => {
+  const url = "/api/proxy/refresh/yahoo"
+
+  const data = {
+    refresh_token,
+  }
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": " application/json",
+    },
+    body: JSON.stringify(data),
+  })
+
+  const parsedBody = await response.json()
+  const { access_token: new_access_token } = parsedBody
+
+  return new_access_token
+}

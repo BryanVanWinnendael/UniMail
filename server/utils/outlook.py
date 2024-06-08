@@ -71,7 +71,6 @@ def get_emails(access_token: str, email: str):
         return {}
     json = response.json()
     mails = json.get('value', [])
-    print(f"Total emails fetched: {len(mails)}")
     new_emails = OrderedDict()
 
     cpus = cpu_count()

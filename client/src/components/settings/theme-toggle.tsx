@@ -23,15 +23,19 @@ const ThemeToggle = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem className="flex" onClick={() => setTheme("light")}>
-          <Check className={`w-5 h-5 pr-2 ${theme != "light" && "opacity-0"}`}/>
+          <Check
+            className={`w-5 h-5 pr-2 ${theme != "light" && "opacity-0"}`}
+          />
           <p>Light</p>
         </DropdownMenuItem>
         <DropdownMenuItem className="flex" onClick={() => setTheme("dark")}>
-          <Check className={`w-5 h-5 pr-2 ${theme != "dark" && "opacity-0"}`}/>
+          <Check className={`w-5 h-5 pr-2 ${theme != "dark" && "opacity-0"}`} />
           <p>Dark</p>
         </DropdownMenuItem>
         <DropdownMenuItem className="flex" onClick={() => setTheme("system")}>
-          <Check className={`w-5 h-5 pr-2 ${theme != "system" && "opacity-0"}`}/>
+          <Check
+            className={`w-5 h-5 pr-2 ${theme != "system" && "opacity-0"}`}
+          />
           <p>System</p>
         </DropdownMenuItem>
       </DropdownMenuContent>

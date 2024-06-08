@@ -9,14 +9,16 @@ interface LoadingProps {
 const Loading = ({ n, h = "3rem", w }: LoadingProps) => {
   return (
     <div className="flex flex-col gap-4">
-      {
-        Array.from({ length: n }).map((_, index) => (
-          <Skeleton style={{
+      {Array.from({ length: n }).map((_, index) => (
+        <Skeleton
+          style={{
             height: h,
-            width: w
-          }} key={index} className="w-full rounded-md" />
-        ))
-      }
+            width: w,
+          }}
+          key={index}
+          className="w-full rounded-md"
+        />
+      ))}
     </div>
   )
 }

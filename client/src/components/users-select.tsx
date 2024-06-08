@@ -1,5 +1,5 @@
 import { Check, ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { IMAGES, cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Command,
@@ -12,28 +12,32 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import useAuth from "@/hooks/useAuth"
 import { useAppSelector } from "@/redux/store"
 import { useDispatch } from "react-redux"
-import { setActiveEmail } from "@/redux/features/auth-slice"
+import { setActiveAccount } from "@/redux/features/auth-slice"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import Loading from "./inbox/loading"
+import { Platforms } from "@/types"
+import Image from "next/image"
 
 const UsersSelect = () => {
   const { getEmails } = useAuth()
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
   const emails = getEmails()
   const [open, setOpen] = useState(false)
-  const activeEmail = useAppSelector((state) => state.authReducer.value.activeEmail)
+  const activeAccount = useAppSelector(
+    (state) => state.authReducer.value.activeAccount,
+  )
 
-  const handleSwitchAccount = (email: string) => {
-    dispatch(setActiveEmail(email))
+  const handleSwitchAccount = (emailPlatform: string, platform: Platforms) => {
+    const email = emailPlatform.split(" ")[0]
+    dispatch(setActiveAccount({ email, platform }))
     setOpen(false)
   }
 
-  return (
-    activeEmail ?
+  return activeAccount.email ? (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
@@ -43,12 +47,18 @@ const UsersSelect = () => {
           className="w-full justify-between"
         >
           <Tooltip>
-            <TooltipTrigger className="overflow-hidden"> <p className="overflow-hidden text-ellipsis whitespace-nowrap"> {activeEmail}</p></TooltipTrigger>
+            <TooltipTrigger className="overflow-hidden">
+              {" "}
+              <p className="overflow-hidden text-ellipsis whitespace-nowrap">
+                {" "}
+                {activeAccount.email}
+              </p>
+            </TooltipTrigger>
             <TooltipContent>
-              <p>{activeEmail}</p>
+              <p>{activeAccount.email}</p>
             </TooltipContent>
           </Tooltip>
-          
+
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -56,32 +66,46 @@ const UsersSelect = () => {
         <Command>
           <CommandList className="bg-primary">
             <CommandGroup>
-              {
-                Object.entries(emails).map(([platform, platformEmails]) => {
-                  return platformEmails.map((email) => {
-                    return (
-                      <CommandItem
-                      key={email}
-                      value={email}
+              {Object.entries(emails).map(([platform, platformEmails]) => {
+                return platformEmails.map((email) => {
+                  return (
+                    <CommandItem
+                      key={email + platform}
+                      value={email + " " + platform}
                       onSelect={(currentValue) => {
-                        handleSwitchAccount(currentValue)
+                        handleSwitchAccount(currentValue, platform as Platforms)
                       }}
                     >
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4 text-main",
-                          activeEmail === email ? "opacity-100" : "opacity-0"
+                          activeAccount.email === email &&
+                            activeAccount.platform === platform
+                            ? "opacity-100"
+                            : "opacity-0",
                         )}
                       />
+                      <Image
+                        className="mr-2"
+                        width={12}
+                        height={12}
+                        src={IMAGES[platform as Platforms]}
+                        loading="lazy"
+                        alt="button logo"
+                      />
                       <Tooltip>
-                        <TooltipTrigger className="overflow-hidden"> <p className="overflow-hidden text-ellipsis whitespace-nowrap">{email}</p></TooltipTrigger>
+                        <TooltipTrigger className="overflow-hidden">
+                          {" "}
+                          <p className="overflow-hidden text-ellipsis whitespace-nowrap">
+                            {email}
+                          </p>
+                        </TooltipTrigger>
                         <TooltipContent>
                           <p>{email}</p>
                         </TooltipContent>
                       </Tooltip>
-                      
                     </CommandItem>
-                    )
+                  )
                 })
               })}
             </CommandGroup>
@@ -89,7 +113,8 @@ const UsersSelect = () => {
         </Command>
       </PopoverContent>
     </Popover>
-    : <Loading n={1} h="40px" w="193px"/>
+  ) : (
+    <Loading n={1} h="40px" w="193px" />
   )
 }
 

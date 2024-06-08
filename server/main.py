@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import gmail, outlook, yahoo
+from routers import gmail, outlook, imap
 
 
 load_dotenv()
@@ -32,9 +32,9 @@ app.include_router(
 )
 
 app.include_router(
-    router=yahoo.router,
-    prefix="/api/yahoo",
-    tags=["yahoo"],
+    router=imap.router,
+    prefix="/api/imap",
+    tags=["imap"],
 )
 
 

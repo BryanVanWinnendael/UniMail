@@ -1,20 +1,24 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react"
 
 interface EmailFrameProps {
   body: string
 }
 
 const EmailFrame = ({ body }: EmailFrameProps) => {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null)
 
   useEffect(() => {
     if (iframeRef.current) {
-      iframeRef.current.srcdoc = body;
+      iframeRef.current.srcdoc = body
     }
-  }, [body]);
+  }, [body])
 
   return (
-    <iframe className="rounded-md" ref={iframeRef} style={{ width: '100%', height: '100%', border: 'none' }} />
+    <iframe
+      className="rounded-md"
+      ref={iframeRef}
+      style={{ width: "100%", height: "100%", border: "none" }}
+    />
   )
 }
 

@@ -1,33 +1,32 @@
 export const getAccessRefreshToken = async (code: string) => {
-  const TOKEN_URL = 'https://oauth2.googleapis.com/token'
+  const TOKEN_URL = "https://oauth2.googleapis.com/token"
   const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
   const CLIENT_SECRET = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET
   const REDIRECT_URI = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
 
   if (!CLIENT_ID || !CLIENT_SECRET) {
-    throw new Error('Missing Google Client ID or Client Secret');
+    throw new Error("Missing Google Client ID or Client Secret")
   }
-  
+
   const data = {
-    'code': code,
-    'client_id': CLIENT_ID,
-    'client_secret': CLIENT_SECRET,
-    'redirect_uri': REDIRECT_URI,
-    'grant_type': 'authorization_code'
+    code: code,
+    client_id: CLIENT_ID,
+    client_secret: CLIENT_SECRET,
+    redirect_uri: REDIRECT_URI,
+    grant_type: "authorization_code",
   }
 
   const response = await fetch(TOKEN_URL, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+      "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: new URLSearchParams(data as any).toString()
+    body: new URLSearchParams(data as any).toString(),
   })
 
-  const responseBody = await response.text();
+  const responseBody = await response.text()
   const parsedBody = JSON.parse(responseBody)
   const { access_token, refresh_token } = parsedBody
 
   return { access_token, refresh_token }
 }
-

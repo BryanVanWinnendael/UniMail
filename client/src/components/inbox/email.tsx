@@ -1,9 +1,6 @@
-import { Buffer } from "buffer";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog"
-import EmailFrame from "./email-frame";
+import { Buffer } from "buffer"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+import EmailFrame from "./email-frame"
 
 interface EmailProps {
   encoded_body: string
@@ -11,11 +8,16 @@ interface EmailProps {
   setFullScreenEmail: (full: boolean) => void
 }
 
-const Email = ({ encoded_body, fullScreenEmail, setFullScreenEmail }: EmailProps) => {
-  const decode = (str: string): string => Buffer.from(str, 'base64').toString('utf-8');
-  const decoded_body = decode(encoded_body);
+const Email = ({
+  encoded_body,
+  fullScreenEmail,
+  setFullScreenEmail,
+}: EmailProps) => {
+  const decode = (str: string): string =>
+    Buffer.from(str, "base64").toString("utf-8")
+  const decoded_body = decode(encoded_body)
   const toggleFullScreen = () => {
-    setFullScreenEmail(!fullScreenEmail);
+    setFullScreenEmail(!fullScreenEmail)
   }
 
   return (
@@ -28,7 +30,7 @@ const Email = ({ encoded_body, fullScreenEmail, setFullScreenEmail }: EmailProps
         </DialogContent>
       </Dialog>
     </div>
-  );
+  )
 }
 
-export default Email;
+export default Email

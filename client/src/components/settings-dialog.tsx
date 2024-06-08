@@ -1,20 +1,16 @@
 "use client"
-import {
-  Dialog,
-  DialogContent,
-  DialogOverlay,
-} from "@/components/ui/dialog"
-import { toggleDialog } from "@/redux/features/settings-slice";
-import { useAppSelector } from "@/redux/store";
-import { useDispatch } from "react-redux";
-import Settings from "./settings";
+import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog"
+import { toggleDialog } from "@/redux/features/settings-slice"
+import { useAppSelector } from "@/redux/store"
+import { useDispatch } from "react-redux"
+import Settings from "./settings"
 
 const SettingsDialog = () => {
-  const isOpen = useAppSelector((state) => state.settingsReducer.value.isOpen);
-  const dispatch = useDispatch();
+  const isOpen = useAppSelector((state) => state.settingsReducer.value.isOpen)
+  const dispatch = useDispatch()
 
   const handleToggleDialog = () => {
-    dispatch(toggleDialog());
+    dispatch(toggleDialog())
   }
 
   return (
