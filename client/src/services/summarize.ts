@@ -4,7 +4,7 @@ export const summarize = async (text: string): Promise<SummarizeResponse> => {
   const token = localStorage.getItem("api_key")
   if (!token) return { error: { response: "No API key found" } }
 
-  const url = process.env.NEXT_PUBLIC_API_URL + "summarize"
+  const url = "/api/proxy/summarize"
   return fetch(url, {
     method: "POST",
     headers: {
