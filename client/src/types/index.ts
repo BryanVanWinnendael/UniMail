@@ -53,3 +53,12 @@ export type Tokens = {
 export type PlatformsEmails = {
   [key in Platforms]: string[]
 }
+
+export type SummarizeResponse = {
+  data?:{
+    response: string
+  }
+  error?: {
+    response: string
+  }
+}

@@ -8,7 +8,7 @@ interface EmailProps {
   setFullScreenEmail: (full: boolean) => void
 }
 
-const Email = ({
+const Index = ({
   encoded_body,
   fullScreenEmail,
   setFullScreenEmail,
@@ -33,4 +33,4 @@ const Email = ({
   )
 }
 
-export default Email
+export default Index

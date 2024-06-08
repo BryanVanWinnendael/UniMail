@@ -2,17 +2,18 @@ import useAuth from "@/hooks/useAuth"
 import { getUserEmails } from "@/services/email"
 import { UserEmails } from "@/types"
 import { useCallback, useEffect, useRef, useState } from "react"
-import Toolbar from "./toolbar"
+import Toolbar from "../toolbar"
 import { useAppSelector } from "@/redux/store"
 import { toast } from "sonner"
 import EmailList from "./email-list"
-import Email from "./email"
+import Email from "@/components/email"
 import useCache from "@/hooks/useCache"
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
+import { summarize } from "@/services/summarize"
 
 const DEFAULT_EMAILS: UserEmails = {
   user: "",
@@ -125,6 +126,15 @@ const Index = ({ setEmailsCount }: IndexProps) => {
     }
   }, [getCache, getLocalStorageActiveAccount, setEmailsCount])
 
+  const summarizeText = async () => {
+    if (!activeMail) return { data: { response: "" } }
+    const encoded_body = userEmails.emails[activeMail].body
+    const decode = (str: string): string =>
+      Buffer.from(str, "base64").toString("utf-8")
+    const decoded_body = decode(encoded_body)
+    return await summarize(decoded_body)
+  }
+
   useEffect(() => {
     fetchingRef.current = false
     getCachedEmails()
@@ -163,6 +173,7 @@ const Index = ({ setEmailsCount }: IndexProps) => {
           loading={loading}
           refresh={refresh}
           setSearchQuery={setSearchQuery}
+          summarizeText={summarizeText}
         />
 
         {sideView ? (

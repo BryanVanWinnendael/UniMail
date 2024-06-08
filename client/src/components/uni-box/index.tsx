@@ -1,12 +1,13 @@
 import useAuth from "@/hooks/useAuth"
 import { getUserEmails } from "@/services/email"
 import { Platforms, UniMails } from "@/types"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import Toolbar from "../inbox/toolbar"
+import { useCallback, useEffect, useRef, useState } from "react"
+import Toolbar from "@/components/toolbar"
 import FilteredEmails from "./filtered-emails"
-import Email from "../inbox/email"
+import Email from "@/components/email"
 import { toast } from "sonner"
 import useCache from "@/hooks/useCache"
+import { summarize } from "@/services/summarize"
 
 interface IndexProps {
   setEmailsCount: (n: number) => void
@@ -130,6 +131,15 @@ const Index = ({ setEmailsCount }: IndexProps) => {
     getEmails(user)
   }
 
+  const summarizeText = async () => {
+    if (!activeMail) return { data: { response: "" } }
+    const encoded_body =  userEmails[activeMail.email].emails[activeMail.id].body
+    const decode = (str: string): string =>
+      Buffer.from(str, "base64").toString("utf-8")
+    const decoded_body = decode(encoded_body)
+    return await summarize(decoded_body)
+  } 
+
   useEffect(() => {
     const getCachedEmails = async () => {
       const emailsToken = getEmailsToken()
@@ -201,6 +211,7 @@ const Index = ({ setEmailsCount }: IndexProps) => {
           sortType="uni"
           emails={userEmails}
           users={getEmailsToken()}
+          summarizeText={summarizeText}
         />
         <div className="overflow-y-auto h-full" ref={scrollContainerRef}>
           {activeMail.id ? (

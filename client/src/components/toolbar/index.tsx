@@ -3,7 +3,7 @@ import RefreshButton from "./refresh-button"
 import { ChevronLeft, Maximize2, Ungroup } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 import SortButton from "./sort-button"
-import { Tokens, UniMails, UserEmails } from "@/types"
+import { SummarizeResponse, Tokens, UniMails, UserEmails } from "@/types"
 import { Dispatch, SetStateAction } from "react"
 import UsersScroll from "../uni-box/users-scroll"
 import {
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/accordion"
 import { getDateTime } from "@/lib/utils"
 import { useDispatch } from "react-redux"
+import Summarize from "./summarize"
 
 interface ToolbarProps {
   loading: boolean
@@ -35,9 +36,10 @@ interface ToolbarProps {
   emails: UserEmails | UniMails
   sortType: "user" | "uni"
   users?: Tokens
+  summarizeText: () => Promise<SummarizeResponse>
 }
 
-const Toolbar = ({
+const Index = ({
   loading,
   refresh,
   setSearchQuery,
@@ -50,6 +52,7 @@ const Toolbar = ({
   sortType,
   emails,
   users,
+  summarizeText,
 }: ToolbarProps) => {
   const toggleFullScreen = () => {
     setFullScreenEmail(!fullScreenEmail)
@@ -111,17 +114,20 @@ const Toolbar = ({
         <div className="flex w-full justify-end gap-2">
           {users && !active_email && <UsersScroll users={users} />}
           {active_email ? (
-            <Tooltip>
-              <TooltipTrigger>
-                <Maximize2
-                  className="w-4 h-4 text-ring cursor-pointer"
-                  onClick={toggleFullScreen}
-                />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>full screen email</p>
-              </TooltipContent>
-            </Tooltip>
+            <div className="flex gap-2">
+              <Summarize summarizeText={summarizeText}/>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Maximize2
+                    className="w-4 h-4 text-ring cursor-pointer"
+                    onClick={toggleFullScreen}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>full screen email</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           ) : (
             <SortButton
               emails={emails}
@@ -135,4 +141,4 @@ const Toolbar = ({
   )
 }
 
-export default Toolbar
+export default Index

@@ -5,3 +5,4 @@ google-api-python-client==2.130.0
 fastapi==0.111.0
 pytz==2024.1
 imaplib2==3.6
+groq==0.8.0

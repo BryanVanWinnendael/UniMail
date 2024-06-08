@@ -18,7 +18,7 @@ import { useAppSelector } from "@/redux/store"
 import { useDispatch } from "react-redux"
 import { setActiveAccount } from "@/redux/features/auth-slice"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
-import Loading from "./inbox/loading"
+import Loading from "./loading"
 import { Platforms } from "@/types"
 import Image from "next/image"
 

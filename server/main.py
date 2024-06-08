@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import gmail, outlook, imap
+from routers import gmail, outlook, imap, summarize
 
 
 load_dotenv()
@@ -35,6 +35,12 @@ app.include_router(
     router=imap.router,
     prefix="/api/imap",
     tags=["imap"],
+)
+
+app.include_router(
+    router=summarize.router,
+    prefix="/api/summarize",
+    tags=["summarize"],
 )
 
 

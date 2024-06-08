@@ -1,6 +1,9 @@
+import Link from "next/link"
+import ApiKey from "../api-key"
 import FavoriteAccount from "../favorite-account"
 import SideViewToggle from "../side-view-toggle"
 import ThemeToggle from "./theme-toggle"
+import { SquareArrowOutUpRight } from "lucide-react"
 
 const General = () => {
   return (
@@ -36,6 +39,18 @@ const General = () => {
         </div>
         <div className="flex justify-end w-full h-full items-center">
           <SideViewToggle />
+        </div>
+      </div>
+
+      <div className="w-full grid justify-between grid-cols-[0.7fr_0.3fr] mt-6">
+        <div className="w-full flex flex-col">
+          <p className="text-lg font-semibold flex gap-1 items-center">Summarizer API Key <Link target="_blank" href="https://console.groq.com/keys"><SquareArrowOutUpRight className="w-4 h-4 text-indigo-500 dark:text-indigo-400"/></Link></p>
+          <p className="text-muted-foreground">
+            Add your API key for the summarizer.
+          </p>
+        </div>
+        <div className="flex justify-end w-full h-full items-center">
+          <ApiKey />
         </div>
       </div>
     </div>
