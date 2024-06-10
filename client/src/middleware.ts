@@ -7,7 +7,6 @@ export const middleware = async (req: NextRequest, res: NextResponse) => {
   }
   const tokensEncrypted = accountsCookie.value
   const token: string[] = JSON.parse(atob(tokensEncrypted))
-
   if (token.length === 0) {
     return NextResponse.redirect(new URL("login", req.nextUrl))
   }

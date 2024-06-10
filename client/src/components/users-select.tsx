@@ -29,7 +29,7 @@ const UsersSelect = () => {
   const [open, setOpen] = useState(false)
   const activeAccount = useAppSelector(
     (state) => state.authReducer.value.activeAccount,
-  )
+  ) || { email: "", platform: "" }
 
   const handleSwitchAccount = (emailPlatform: string, platform: Platforms) => {
     const email = emailPlatform.split(" ")[0]

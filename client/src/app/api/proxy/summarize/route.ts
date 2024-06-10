@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   const { text } = JSON.parse(body)
 
   const data = {
-    text
+    text,
   }
 
   try {

@@ -9,9 +9,11 @@ const General = () => {
   return (
     <div className="p-5 flex flex-col h-full">
       <div className="w-full flex justify-between mt-6">
-        <div>
+        <div className="w-full flex flex-col">
           <p className="text-lg font-semibold">Theme</p>
-          <p className="text-muted-foreground">Change your theme</p>
+          <p className="text-muted-foreground w-full text-sm">
+            Change your theme
+          </p>
         </div>
         <div className="flex justify-end w-full h-full items-center">
           <ThemeToggle />
@@ -21,7 +23,7 @@ const General = () => {
       <div className="w-full grid justify-between grid-cols-[0.7fr_0.3fr] mt-6">
         <div className="w-full flex flex-col">
           <p className="text-lg font-semibold">Default email</p>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Change the default email that is used for your inbox
           </p>
         </div>
@@ -33,7 +35,7 @@ const General = () => {
       <div className="w-full grid justify-between grid-cols-[0.7fr_0.3fr] mt-6">
         <div className="w-full flex flex-col">
           <p className="text-lg font-semibold">Side View</p>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             When enabled, email viewer will be next to your inbox
           </p>
         </div>
@@ -50,7 +52,7 @@ const General = () => {
               <SquareArrowOutUpRight className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
             </Link>
           </p>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Add your API key for the summarizer.
           </p>
         </div>

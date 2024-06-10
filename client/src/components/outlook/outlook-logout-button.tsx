@@ -1,6 +1,5 @@
 "use client"
 import useAuth from "@/hooks/useAuth"
-import { msalInstance } from "@/config/msal"
 import EmailButton from "../email-button"
 
 interface OutlookLogoutButtonProps {

@@ -18,7 +18,24 @@ const Index = () => {
   return (
     <div className="md:min-h-screen w-full">
       <div className="md:flex hidden flex-col">
-        <div className="pl-4 flex h-fit py-2 items-center">
+        <div className="pl-4 flex gap-2 h-fit py-2 items-center">
+          <svg
+            className="w-8 h-8 fill-secondary-foreground stroke-primary"
+            viewBox="0 0 85 57"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="85" height="57" rx="10" />
+            <path
+              d="M60 20L55.5975 31.7971C54.43 34.9257 51.4419 37 48.1024 37H42"
+              stroke-width="3"
+            />
+            <path
+              d="M25 20L29.4025 31.7971C30.57 34.9257 33.5581 37 36.8976 37H43"
+              stroke-width="3"
+            />
+          </svg>
+
           <h1 className="scroll-m-20 text-lg font-semibold tracking-tight">
             UniMail
           </h1>

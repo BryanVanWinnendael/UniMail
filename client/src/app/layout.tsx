@@ -17,8 +17,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <CookiesProvider>
+    <CookiesProvider>
+      <html lang="en">
         <ClientProviders>
           <body
             className={cn(
@@ -31,7 +31,7 @@ export default function RootLayout({
             <Toaster />
           </body>
         </ClientProviders>
-      </CookiesProvider>
-    </html>
+      </html>
+    </CookiesProvider>
   )
 }

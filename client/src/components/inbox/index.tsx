@@ -62,7 +62,7 @@ const Index = ({ setEmailsCount }: IndexProps) => {
   }
 
   const getEmails = useCallback(async () => {
-    if (fetchingRef.current) return
+    if (fetchingRef.current || !activeAccount.email) return
     fetchingRef.current = true
     setActiveMail("")
     setLoading(true)
@@ -136,6 +136,7 @@ const Index = ({ setEmailsCount }: IndexProps) => {
   }
 
   useEffect(() => {
+    if (!activeAccount.email) return
     fetchingRef.current = false
     getCachedEmails()
     getEmails()

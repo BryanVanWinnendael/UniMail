@@ -1,7 +1,6 @@
 import { toggleDialog } from "@/redux/features/settings-slice"
 import { Platforms, TokenObject, Tokens } from "@/types"
 import { useCookies } from "next-client-cookies"
-import { useRouter } from "next/navigation"
 import { useDispatch } from "react-redux"
 import { setActiveAccount } from "@/redux/features/auth-slice"
 import { useAppSelector } from "@/redux/store"
@@ -17,7 +16,6 @@ type PlatformsEmails = {
 
 const useAuth = () => {
   const { instance } = useMsal()
-  const router = useRouter()
   const dispatch = useDispatch()
   const activeAccount =
     useAppSelector((state) => state.authReducer.value.activeAccount) || ""
@@ -62,10 +60,21 @@ const useAuth = () => {
       if (index > -1) {
         accounts.splice(index, 1)
       }
-      localStorage.setItem("accounts", btoa(JSON.stringify(accounts)))
+
+      const countAccounts = accounts.length
+      if (countAccounts === 0) {
+        cookies.remove("accounts")
+        localStorage.removeItem("active_account")
+        localStorage.removeItem("api_key")
+        localStorage.removeItem("side_view")
+        localStorage.removeItem("theme")
+      } else {
+        cookies.set("accounts", btoa(JSON.stringify(accounts)))
+      }
+
       removeCache(email)
     },
-    [getAccounts, removeCache],
+    [cookies, getAccounts, removeCache],
   )
 
   const getTokens = useCallback((): Tokens => {
@@ -104,7 +113,17 @@ const useAuth = () => {
         delete tokensPlatform[email]
         tokens[platform] = tokensPlatform
       }
-      localStorage.setItem("tokens", btoa(JSON.stringify(tokens)))
+      const countTokens = Object.keys(tokens).reduce(
+        (acc, platform) =>
+          acc + Object.keys(tokens[platform as Platforms]).length,
+        0,
+      )
+
+      if (countTokens === 0) {
+        localStorage.removeItem("tokens")
+      } else {
+        localStorage.setItem("tokens", btoa(JSON.stringify(tokens)))
+      }
     },
     [getTokens],
   )
@@ -126,14 +145,15 @@ const useAuth = () => {
   const logout = (platform: Platforms, email: string) => {
     removeAccount(email, platform)
     removeToken(platform, email)
-    dispatch(toggleDialog())
+    const newUser = getFirstAccount()
 
     // if the active user is the one being logged out, set the active user to the first user
     if (activeAccount.email === email && activeAccount.platform) {
       const newUser = getFirstAccount()
-      dispatch(setActiveAccount(newUser))
+      if (newUser) dispatch(setActiveAccount(newUser))
     }
-    router.refresh()
+    if (!newUser) window.location.href = "/"
+    else dispatch(toggleDialog())
   }
 
   const getOutlookAccounts = (emailsPlatform: string[]) => {
