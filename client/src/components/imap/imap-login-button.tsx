@@ -23,7 +23,7 @@ const IMAPLoginButton = () => {
   const router = useRouter()
 
   const [open, setOpen] = useState(false)
-
+  const [loading, setLoading] = useState(false)
   const [imappInfo, setImapInfo] = useState({
     server: "",
     port: "993",
@@ -32,6 +32,7 @@ const IMAPLoginButton = () => {
   })
 
   const handleLogin = async () => {
+    setLoading(true)
     const password = btoa(imappInfo.password)
 
     const tokenObject: TokenObject = {
@@ -59,6 +60,7 @@ const IMAPLoginButton = () => {
         },
       })
     }
+    setLoading(false)
   }
 
   const handleToggleDialog = () => {
@@ -131,8 +133,8 @@ const IMAPLoginButton = () => {
             />
           </div>
         </div>
-        <Button onClick={handleLogin} variant="secondary">
-          Connect
+        <Button disabled={loading} onClick={handleLogin} variant="secondary">
+          {loading ? "Connecting..." : "Connect"}
         </Button>
       </DialogContent>
     </Dialog>

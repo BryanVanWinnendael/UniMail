@@ -53,7 +53,7 @@ const General = () => {
             </Link>
           </p>
           <p className="text-muted-foreground text-sm">
-            Add your API key for the summarizer.
+            Add your API key for the summarizer
           </p>
         </div>
         <div className="flex justify-end w-full h-full items-center">

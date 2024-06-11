@@ -62,6 +62,8 @@ def get_body(message):
     try:
         if "parts" in message["payload"] and len(message["payload"]["parts"]) > 1:
             return message["payload"]["parts"][1].get("body", {}).get("data", "No body")
+        elif "parts" in message["payload"] and len(message["payload"]["parts"]) == 1:
+            return message["payload"]["parts"][0].get("body", {}).get("data", "No body")
         else:
             return message["payload"]["body"].get("data", "No body")
     except KeyError:

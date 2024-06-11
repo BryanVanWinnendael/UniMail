@@ -15,7 +15,7 @@ const EmailFrame = ({ body }: EmailFrameProps) => {
 
   return (
     <iframe
-      className="rounded-md"
+      className="rounded-md !font-mono"
       ref={iframeRef}
       style={{ width: "100%", height: "100%", border: "none" }}
     />
